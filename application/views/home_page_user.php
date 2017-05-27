@@ -65,6 +65,7 @@
                 </td>				
 			</tr>
 		</table>
+        <p class = "see-more BA-orange">see more...</p>
 	</section>
 	<section class = "main-content-container-h margin-bottom-std">
 		<p class = "BA-green center h-font-size">New Businesses</p>
@@ -91,6 +92,7 @@
                 </td>		
 			</tr>
 		</table>
+        <p class = "see-more BA-orange">see more...</p>
 	</article>
 	</section>	
 	
