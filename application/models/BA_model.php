@@ -6,10 +6,16 @@ class BA_model extends CI_Model {
 		$this->load->database();
 	}	
 	public function authenticate($email,$password){
-		$this->db->select('email,password,user_type');
+		$this->db->select('user_ID,first_name,last_name,user_type');
 		$this->db->where("email = '" . $email . "' and password = md5('" . $password . "')");
 		$query = $this->db->get('users');
 		return $query;
+	}
+	public function add_client($client_details){
+		$this->insert_BA_data("users",$client_details);
+	}
+	public function insert_BA_data($table,$data){
+		$this->db->insert($table,$data);
 	}
 /*	public function retrieve($tableName,$columns,$where){
 		$this->db->select($columns);

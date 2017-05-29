@@ -16,10 +16,18 @@
 		<span id="main-menu-btn"> &#9776; </span>
 		<section id = "text">
 			<ul>
-				<li><a href="<?php echo base_url(); ?>">Home</a></li>
-				<li><a id = "about-us" >About us</a></li>
-				<li><a id = "contact-us" >Contact us</a></li>
-				<li id = "login">Log in</li>
+				<li><a href="<?php echo base_url(); ?>" class = "general">Home</a></li>
+				<li><a id = "about-us" class = "general">About us</a></li>
+				<li><a id = "contact-us" class = "general">Contact us</a></li>
+                <?php 
+				if ($log_status == "logged_out"){
+					echo "<li id = 'login'>Log in</li>";
+				}
+				else{
+					echo "<li id = 'logout'>" . anchor('DBController/logout','Log out (' . $this->session->userdata("first_name") . ')') . "</li>";
+				}
+				?>
+				<!--<li id = "login">Log in</li>-->
                 <!--<li id = "logout">Log out</li>-->
 			</ul>
 			<div class = "login-container">

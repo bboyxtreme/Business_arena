@@ -23,11 +23,12 @@ class DBController extends CI_Controller {
 		$this->load->model('BA_model');
 		$this->load->helper('form');
 		$this->load->helper('url');
-		//$this->load->library('session');
+		$this->load->library('session');
 	}
-	public function index()
+	public function index($log_status = "logged_out")
 	{
-		$this->load->view('header');
+		$data["log_status"] = $log_status;
+		$this->load->view('header',$data);		
 		$this->load->view('home_page_user');
 		//$this->load->view('user_business_page');
 		$this->load->view('footer');
@@ -147,15 +148,31 @@ class DBController extends CI_Controller {
 			$this->load->view('admin_loc_numbers_page');
 		}
 	}
+	public function logout(){
+		$this->session->sess_destroy();
+		$this->index();
+	}
 	public function login(){
 		$email = $this->input->post("email");
 		$password = $this->input->post("password");
-		$result = $this->BA_model->authenticate($email, $password);
+		$result = $this->BA_model->authenticate($email, $password);		
 		if ($result->num_rows() == 1){
-			if ($result->row()->user_type == "Admin"){
-				$this->load->view('header');
+			$user_ID = $result->row()->user_ID;
+			$user_type = $result->row()->user_type;
+			$first_name = $result->row()->first_name;;
+			$last_name = $result->row()->last_name;
+			$data["log_status"] = "logged_in";
+			if ($user_type == "Admin"){		
+				$this->initiate_sesstion($user_ID, $user_type, $first_name, $last_name);		
+				$this->load->view('header', $data);
 				$this->load->view('home_page_admin');
-				$this->load->view('footer');
+				$this->load->view('footer');				
+			}
+			else if ($user_type == "Buisness Owner"){
+				$this->initiate_sesstion($user_ID, $user_type, $first_name, $last_name);
+				$this->load->view('header', $data);
+				$this->load->view('home_page_bo');
+				$this->load->view('footer');				
 			}
 		}
 		/*if ($email == "BO"){
@@ -173,6 +190,46 @@ class DBController extends CI_Controller {
 			$this->load->view('home_page_user');
 			$this->load->view('footer');
 		}*/
+	}
+	public function initiate_sesstion($user_ID, $user_type, $first_name, $last_name){
+		$new_data = array(
+			"user_ID" => $user_ID,
+			"user_type" => $user_type,
+			"first_name" => $first_name,
+			"last_name" => $last_name
+		);
+		$this->session->set_userdata($new_data);
+	}
+	public function add_client($added_by="client"){
+		$user_ID = "C00002";
+		$first_name = $this->input->post("first-name");
+		$sur_name = $this->input->post("sur-name");
+		$dob = $this->input->post("dob");
+		$phone_number = $this->input->post("phone-number");
+		$email = $this->input->post("email");
+		$password = md5($this->input->post("password"));
+		$confirm_password = md5($this->input->post("confirm-password"));
+		$user_type = $this->input->post("user-type");
+		$client_details= array(
+			"user_ID" => $user_ID,
+			"first_name" => $first_name,
+			"last_name" => $sur_name,
+			"dob" => $dob,
+			"phone_number" => $phone_number,
+			"user_type" => $user_type,
+			"email" => $email,
+			"password" => $password,
+			"added_by" => $added_by
+		);
+		/*foreach ($client_details as $key => $value){
+			echo $key . " -> " . $value . "<br>"; 	
+		}*/
+		$this->BA_model->add_client($client_details);
+		$data["success_heading"] = "Client addition successful";	
+		$data["success_msg"] = "You have successfully added " . $first_name . " as a " . $user_type;	
+		$this->load->view('header');
+		$this->load->view('success_page',$data);
+		$this->load->view('footer');
 	}
 }
 	

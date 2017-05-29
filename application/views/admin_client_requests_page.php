@@ -28,19 +28,23 @@
 <div id = "add-client" style = "display: none;">
 	<span class = "modal-closebtn">&#10060;</span> 
         <p class = "title-strip h-font-size margin-bottom-std">ADD NEW CLIENT</p>
+        <?php echo form_open("DBController/add_client/admin"); ?>
         <div id = "admin-add-client-container" class = "_80p-width-center-rwd vertical-align">
+        
             <span class = "BA-dark-orange">First Name:</span>
-            <input type = "text" name = "first-name" placeholder = "Enter first name" class = "BA-input margin-bottom-std"><br> 
+            <input type = "text" name = "first-name" placeholder = "Enter first name" class = "BA-input margin-bottom-std" required><br> 
             <span class = "BA-dark-orange">Sur Name:</span>
             <input type = "text" name = "sur-name" placeholder = "Enter sur name" class = "BA-input margin-bottom-std"><br>
             <span class = "BA-dark-orange">Date of birth:</span>
-            <input type = "text" name = "dob" placeholder = "Enter date of birth" class = "BA-input margin-bottom-std"><br>
+            <input type = "date" name = "dob" placeholder = "Enter date of birth" class = "BA-input margin-bottom-std"><br>
             <span class = "BA-dark-orange">Phone number:</span>
-            <input type = "text" name = "phone-number" placeholder = "Enter phone number" class = "BA-input margin-bottom-std"><br>
+            <input type = "text" name = "phone-number" placeholder = "e.g. 265995926084" class = "BA-input margin-bottom-std" required><br>
             <span class = "BA-dark-orange">Email:</span>
-            <input type = "text" name = "email" placeholder = "Enter email" class = "BA-input margin-bottom-std"><br>
+            <input type = "email" name = "email" placeholder = "Enter email" class = "BA-input margin-bottom-std" required><br>
             <span class = "BA-dark-orange">Password:</span>
             <input type = "password" name = "password" placeholder = "Enter password" class = "BA-input margin-bottom-std">
+            <span class = "BA-dark-orange">Password:</span>
+            <input type = "password" name = "confirm-password" placeholder = "Confirm password" class = "BA-input margin-bottom-std">
             <span class = "BA-dark-orange">User type</span>
             <select name = "user-type" class = "BA-select">
                 <option>Admin</option>
@@ -51,5 +55,6 @@
         <div class = "center-bottom-btn">
         	<input id = "admin-add-client-btn" type = "submit" value = "Submit" class = "BA-button-large">
         </div><br>
+        <?php echo form_close(); ?>
         
 </div>
