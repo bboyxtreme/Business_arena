@@ -325,13 +325,22 @@ $(document).ready(function(){
 	$(".main-content-area").on("click","#admin-loc-numbers-btn",function(){
 		ajax_update('http://Business_arena/index.php/DBController/load/admin-loc-numbers');	
 	});
-	
+	$(".main-content-area").on("click","#add-new-client",function(){
+		$(".modal-frame-small").html($("#add-client").html());
+		$(".modal-BG").css("display","flex");
+	});
+	$(".main-content-area").on("click","#admin-add-client-btn",function(){
+		$("#admin-add-client-container").html("<div class = 'loader-thin'><div style = 'margin: 50px auto 0;'></div></div>");
+	});
 	
 	/*businesses page*/
 	$(".main-content-area").on("click","#add-new-business",function(){
 		$(".modal-frame-small").html($("#add-business").html());
 		$(".modal-BG").css("display","flex");
 	});
+	
+	
+	
 	
 	
 	/*general scripts*/

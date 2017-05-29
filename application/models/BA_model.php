@@ -6,8 +6,9 @@ class BA_model extends CI_Model {
 		$this->load->database();
 	}	
 	public function authenticate($email,$password){
-		$this->db->select('email,password');
-		$query = $this->db->get_where('users',array('email'=>$email,'password'=>$password));
+		$this->db->select('email,password,user_type');
+		$this->db->where("email = '" . $email . "' and password = md5('" . $password . "')");
+		$query = $this->db->get('users');
 		return $query;
 	}
 /*	public function retrieve($tableName,$columns,$where){

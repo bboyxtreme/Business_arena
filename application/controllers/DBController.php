@@ -150,7 +150,15 @@ class DBController extends CI_Controller {
 	public function login(){
 		$email = $this->input->post("email");
 		$password = $this->input->post("password");
-		if ($email == "BO"){
+		$result = $this->BA_model->authenticate($email, $password);
+		if ($result->num_rows() == 1){
+			if ($result->row()->user_type == "Admin"){
+				$this->load->view('header');
+				$this->load->view('home_page_admin');
+				$this->load->view('footer');
+			}
+		}
+		/*if ($email == "BO"){
 			$this->load->view('header');
 			$this->load->view('home_page_bo');
 			$this->load->view('footer');
@@ -164,7 +172,7 @@ class DBController extends CI_Controller {
 			$this->load->view('header');
 			$this->load->view('home_page_user');
 			$this->load->view('footer');
-		}
+		}*/
 	}
 }
 	

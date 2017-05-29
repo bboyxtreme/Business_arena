@@ -39,7 +39,9 @@
             <input type = "text" name = "biz-email" placeholder = "enter business email" class = "BA-input margin-bottom-std"><br>
             <span class = "BA-dark-orange">Buisness mobile</span>
             <input type = "text" name = "biz-mobile" placeholder = "enter business number" class = "BA-input">
+        </div>
         <div class = "center-bottom-btn">
         	<input type = "submit" value = "Submit" class = "BA-button-large">
         </div><br>
+        
 </div>
