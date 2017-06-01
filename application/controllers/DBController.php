@@ -316,11 +316,43 @@ class DBController extends CI_Controller {
 		$this->load->view('client_prds_page',$data);
 		$this->load->view('footer');
 	}
+	public function generate_ID($mod){
+		switch ($mod){
+			case "product" :
+				$lastID = (int)(substr($this->BA_model->get_last_ID("business_products","prd_ID"),2));
+				$prd_ID = "PR" . sprintf("%05d",++$lastID);
+				return $prd_ID;
+				break;
+			case "business" :
+				
+				break;
+			case "category" :
+				
+				break;
+			case "location" :
+				
+				break;				
+		}
+	}
 	public function add_products($mod = "1"){
 		$biz_ID = $this->session->userdata("biz_ID");
-		$prd_ID = "PR00003";
+		$prd_ID = $this->generate_ID("product");
 		if($mod == "1"){
-			$prd_pic = "no_image_thumb.jpg";
+			$config['upload_path'] = './images/uploads/';
+			$config['allowed_types'] = 'jpg|gif|png';
+			$config['max_size']	= '1000';
+			$this->load->library('upload', $config);
+			if ( ! $this->upload->do_upload())
+			{
+				$error = $this->upload->display_errors();
+				echo "You have successfully added a record but " . $error;
+				$prd_pic = "no_image_thumb.jpg";
+			}
+			else
+			{
+				$upload_data = $this->upload->data();
+				$prd_pic = $upload_data['file_name'];				
+			}
 			$prd_type = $this->input->post("prd-type");
 			$prd_name = $this->input->post("prd-name");
 			$prd_price = $this->input->post("prd-price");
@@ -341,13 +373,45 @@ class DBController extends CI_Controller {
 			//$this->BA_model->add_products($prd_details,$prd_category,$prd_pic);
 		}
 		else if($mod == 2){
-			
+			$config['upload_path'] = './uploads/';
+			$config['allowed_types'] = 'csv';
+			$config['max_size']	= '5000';
+			$this->load->library('upload', $config);
+			if ( ! $this->upload->do_upload())
+			{
+				$error = $this->upload->display_errors();
+				echo $error;
+				//$this->session->set_userdata('addPrdPicErr',$error);
+			}
+			else
+			{
+				$upload_data = $this->upload->data();
+				$handle = fopen("./uploads/" . $upload_data['file_name'], "r");		
+				while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+					$prd_name = $data[0];                  	$prd_price = $data[1]; 
+					$prd_quantity = $data[2]; 				$prd_type = $data[3];  
+					$prd_category = $data[4]; 				$prd_condition = $data[5]; 
+					$prd_description = $data[6]; 			$prd_pic = "no_image_thumb.jpg";	
+					$prd_ID = $this->generate_ID("product");	
+					$prd_details = array (
+						"prd_ID" => $prd_ID,
+						"biz_ID" => $biz_ID,
+						"prd_name" => $prd_name,
+						"prd_price" => $prd_price,
+						"prd_quantity" => $prd_quantity,
+						"prd_type" => $prd_type,
+						"prd_condition" => $prd_condition,
+						"prd_description" => $prd_description,
+					);
+					$this->BA_model->add_products($prd_details,$prd_category,$prd_pic,false);
+					/*foreach ($product as $row){
+						echo $row . " ";
+					}
+					echo "<br>";*/
+				}
+				fclose($handle);				
+			}
 		}	
-		/*foreach ($prd_details as $key => $value){
-			echo $key . " -> " . $value . "<br>"; 	
-		}*/
-		//echo "category -> " . $prd_category . "<br>";
-		//echo "cond -> " . $this->input->post("prd-condition");		
 	}
 	public function edit_products($prd_ID){
 		$biz_ID = $this->session->userdata("biz_ID");

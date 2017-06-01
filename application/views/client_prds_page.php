@@ -64,7 +64,7 @@
         <p class = "title-strip h-font-size no-margin">ADD PRODUCTS</p>
         <div class = "info-body">        
         <section class = "section-1 vertical-align">
-        	<?php echo form_open("DBController/add_products"); ?>
+        	<?php echo form_open_multipart("DBController/add_products"); ?>
                 <p class = "BA-dark-orange info-item-emboss margin-top-std">Upload Single product</p>
                 <input type = "text" name = "prd-name" placeholder = "enter prd name" class = "BA-input margin-top-std"><br>
                 <input type = "text" name = "prd-price" placeholder = "enter prd Unit Price" class = "BA-input margin-top-std"><br>
@@ -83,7 +83,7 @@
                 </select><br>
                 <textarea name = "prd-description" class = "BA-input margin-top-std no-resize _100pwidth" rows = 5 placeholder = "enter prd specifications"></textarea>
                 <p class = "BA-green">Upload picture (optional. can be done later at your own convinience</p>
-                <input type = "file" name = "prd-pic" placeholder = "enter prd name" class = "BA-input" class = "BA-input margin-bottom-std"><br><br>
+                <input type = "file" name = "userfile" class = "BA-input" class = "BA-input margin-bottom-std"><br><br>
                 <input type = "submit" value = "Submit" class = "BA-button-large margin-bottom-std">
             <?php echo form_close(); ?>
         </section>

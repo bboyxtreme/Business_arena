@@ -62,18 +62,73 @@ class BA_model extends CI_Model {
 		return $result;
 	}
 	public function load_prd_categories(){
-		$this->db->select("*")->from("product_categories");	
+		$this->db->select("*")->from("product_categories")->where("confirm_status","confirmed");	
 		$result = $this->db->get();
 		return $result;
 	}
-	public function add_products($prd_details,$prd_category,$prd_pic){
-		$this->insert_BA_data("business_products",$prd_details);
-		$category = array(
-			"prd_ID" => $prd_details["prd_ID"],
-			"cat_ID" => $prd_category,
-			"cat_usage" => "main"
+	public function check_CAT($cat){
+		$prd_categories = $this->load_prd_categories();
+		foreach ($prd_categories->result() as $row){
+			if ($cat == $row->cat_name){
+				$cat_details = array(
+					"cat_ID" => $row->cat_ID,
+					"mod" => "existing_cat"
+				);
+				return $cat_details;
+			}
+		}
+		$cat_ID = (int)(substr($this->get_last_ID("product_categories","cat_ID"),3));
+		$cat_ID = "CAT" . sprintf("%03d",++$cat_ID);
+		$cat_details = array(
+			"cat_ID" => $cat_ID,
+			"cat_name" => $cat,
+			"confrim_status" => "not_confirmed",
+			"mod" => "new_cat"
 		);
-		$this->insert_BA_data("product_product_category",$category);	
+		return $cat_details;
+	}
+	public function add_products($prd_details,$prd_category,$prd_pic,$mod = true){
+		//update products
+		$this->insert_BA_data("business_products",$prd_details);
+		
+		
+		//update categories
+		if ($mod){
+			$category = array(
+				"prd_ID" => $prd_details["prd_ID"],
+				"cat_ID" => $prd_category,
+				"cat_usage" => "main"
+			);
+			$this->insert_BA_data("product_product_category",$category);
+		}
+		else{
+			$cat_details = $this->check_CAT($prd_category);
+			if ($cat_details["mod"] == "existing_cat"){
+				$category = array(
+					"prd_ID" => $prd_details["prd_ID"],
+					"cat_ID" => $cat_details["cat_ID"],
+					"cat_usage" => "main"
+				);
+				$this->insert_BA_data("product_product_category",$category);
+			}
+			else if ($cat_details["mod"] == "new_cat"){
+				$category_add = array(
+					"cat_ID" => $cat_details["cat_ID"],
+					"cat_name" => $cat_details["cat_name"],
+					"confirm_status" => $cat_details["confrim_status"]
+				);
+				$this->insert_BA_data("product_categories",$category_add);
+				$category = array(
+					"prd_ID" => $prd_details["prd_ID"],
+					"cat_ID" => $cat_details["cat_ID"],
+					"cat_usage" => "main"
+				);
+				$this->insert_BA_data("product_product_category",$category);				
+			}
+		}
+		
+		
+		//update picture	
 		$pic_details = array(
 			"prd_ID" => $prd_details["prd_ID"],
 			"pic_name" => $prd_pic,
@@ -87,6 +142,11 @@ class BA_model extends CI_Model {
 	public function update_BA_data($table,$data,$where){
 		$this->db->where($where);
 		$this->db->update($table,$data);
+	}
+	public function get_last_ID($table,$column){
+		$this->db->select($column)->from($table)->order_by($column,"desc");
+		$result = $this->db->get()->row()->$column;
+		return $result;		
 	}
 /*	public function retrieve($tableName,$columns,$where){
 		$this->db->select($columns);
