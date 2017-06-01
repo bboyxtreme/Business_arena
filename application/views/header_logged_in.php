@@ -19,7 +19,8 @@
 				<li><a href="<?php echo base_url(); ?>" class = "general">Home</a></li>
 				<li><a id = "about-us" class = "general">About us</a></li>
 				<li><a id = "contact-us" class = "general">Contact us</a></li>
-				<li id = 'login'>Log in</li>
+                <li id = 'logout'><a href='http://Business_arena/logout'>Log out (<?php echo $this->session->userdata("first_name"); ?>)</a></li>
+			
 				<!--<li id = "login">Log in</li>-->
                 <!--<li id = "logout">Log out</li>-->
 			</ul>
@@ -93,4 +94,4 @@
 		
 			
 			
-	
+	<!doctype html>

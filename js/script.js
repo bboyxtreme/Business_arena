@@ -209,9 +209,12 @@ $(document).ready(function(){
 	
 	/*Client panel scripts*/
 	//Home page
-	$(".biz-card-button").click(function(){
+	/*$(".biz-card-button").click(function(){
 		$(document).scrollTop(0);
 		ajax_update('http://Business_arena/index.php/DBController/load/biz_ctrl_panel');
+	});*/
+	$("#client-add-business").click(function(){
+		alert();
 	});
 	//Control panel
 	$(".main-content-area").on("click","#ctrl-panel-prds",function(){
@@ -254,6 +257,11 @@ $(document).ready(function(){
 	});
 	$(".main-content-area").on("click","#edit-biz-details-btn",function(){
 			$(".modal-BG").css("display","flex");
+			$("input[name='biz-name']").val($("#client-biz-name-label").text());
+			$("input[name='biz-slogan']").val($("#client-biz-slogan-label").text());
+			$("input[name='biz-field']").val($("#client-biz-field-label").text());
+			$("input[name='biz-mobile']").val($("#client-biz-mobile-label").text());
+			$("input[name='biz-email']").val($("#client-biz-email-label").text());
 	});
 	
 	//Products page and Locations page

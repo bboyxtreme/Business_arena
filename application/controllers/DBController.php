@@ -25,13 +25,28 @@ class DBController extends CI_Controller {
 		$this->load->helper('url');
 		$this->load->library('session');
 	}
-	public function index($log_status = "logged_out")
+	public function index()//$log_status = "logged_out"
 	{
-		$data["log_status"] = $log_status;
-		$this->load->view('header',$data);		
+		/*$user_type = $this->session->userdata("user_type");
+		if($user_type == "Business Owner" || $user_type == "Admin"){
+			$data["log_status"] = "logged in";
+		}else{
+			$data["log_status"] = $log_status;
+		}
+		if($user_type == "Business Owner"){
+			$this->load->view('header',$data);		
+			$this->load->view('home_page_bo');
+			$this->load->view('footer');
+		}
+		else{
+			$this->load->view('header',$data);		
+			$this->load->view('home_page_user');
+			$this->load->view('footer');	
+		}*/
+		//$data["log_status"] = $log_status;	
+		$this->load->view('header');		
 		$this->load->view('home_page_user');
-		//$this->load->view('user_business_page');
-		$this->load->view('footer');
+		$this->load->view('footer');	
 	}
 	public function about_page(){
 		$this->load->view('header');
@@ -43,10 +58,20 @@ class DBController extends CI_Controller {
 		$this->load("contact_us");
 		$this->load->view('footer');
 	}
-	public function show_business($business_name){
-		$this->load->view('header');
-		$this->load("business");
-		$this->load->view('footer');
+	public function show_business($business_name){		
+			$this->load->view('header');
+			$this->load->view('user_business_page');
+			$this->load->view('footer');
+	}
+	public function show_business_ctrl_panel($biz_ID){
+		$user_ID = $this->session->userdata("user_ID");
+		$this->session->set_userdata("biz_ID",$biz_ID);
+		$data['views'] = $this->BA_model->load_business_views($biz_ID);
+		$data['biz_info'] = $this->BA_model->load_business_info($user_ID,$biz_ID)->row();
+		$this->session->set_userdata("biz_name",$data['biz_info']->biz_name);	
+		$this->load->view('header_logged_in');
+		$this->load->view('business_control_panel',$data);
+		$this->load->view('footer');		
 	}
 	public function show_product($business_name,$product_name){
 		//cho $business_name . "<br>" . $product_name;
@@ -164,14 +189,21 @@ class DBController extends CI_Controller {
 			$data["log_status"] = "logged_in";
 			if ($user_type == "Admin"){		
 				$this->initiate_sesstion($user_ID, $user_type, $first_name, $last_name);		
-				$this->load->view('header', $data);
+				$this->load->view('header_logged_in', $data);
 				$this->load->view('home_page_admin');
 				$this->load->view('footer');				
 			}
 			else if ($user_type == "Buisness Owner"){
 				$this->initiate_sesstion($user_ID, $user_type, $first_name, $last_name);
-				$this->load->view('header', $data);
-				$this->load->view('home_page_bo');
+				$businesses = $this->BA_model->load_business_info($user_ID);
+				if ($businesses->num_rows() == 0){
+					$data['no_businesses'] = "You do not have any businesses at the moment. Start by creating one now!";					
+				}
+				else{
+					$data['businesses'] = $businesses;
+				}
+				$this->load->view('header_logged_in', $data);
+				$this->load->view('home_page_bo', $data);
 				$this->load->view('footer');				
 			}
 		}
@@ -230,6 +262,114 @@ class DBController extends CI_Controller {
 		$this->load->view('header');
 		$this->load->view('success_page',$data);
 		$this->load->view('footer');
+	}
+	public function add_business(){
+		$user_ID = $this->session->userdata("user_ID");
+		$biz_ID = "BD00002";
+		$biz_name = $this->input->post("biz-name");
+		$biz_slogan = $this->input->post("biz-slogan");
+		$biz_field = $this->input->post("biz-field");
+		$biz_email = $this->input->post("biz-main-email");
+		$biz_mobile = $this->input->post("biz-main-mobile");
+		$reg_date = date("Y-m-d");
+		$biz_details= array(
+			"biz_ID" => $biz_ID,
+			"biz_name" => $biz_name,
+			"biz_slogan" => $biz_slogan,
+			"biz_main_field" => $biz_field,
+			"biz_main_mobile" => $biz_mobile,
+			"biz_main_email" => $biz_email,
+			"biz_reg_date" => $reg_date,
+		);
+		/*foreach ($biz_details as $key => $value){
+			echo $key . " -> " . $value . "<br>"; 	
+		}*/
+		$this->BA_model->add_business($biz_details,$user_ID);
+		$data["success_heading"] = "Business addition successful";	
+		$data["success_msg"] = "You have successfully added " . $biz_name . " as your buisness";	
+		$this->load->view('header');
+		$this->load->view('success_page',$data);
+		$this->load->view('footer');
+	}
+	public function edit_business_info(){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$biz_name = $this->input->post("biz-name");
+		$biz_slogan = $this->input->post("biz-slogan");
+		$biz_field = $this->input->post("biz-field");
+		$biz_email = $this->input->post("biz-email");
+		$biz_mobile = $this->input->post("biz-mobile");	
+		$biz_update = array(
+			"biz_name" => $biz_name,
+			"biz_slogan" => $biz_slogan,
+			"biz_main_field" => $biz_field,
+			"biz_main_mobile" => $biz_mobile,
+			"biz_main_email" => $biz_email
+		);
+		$this->BA_model->update_biz_info($biz_ID,$biz_update);
+		$this->show_business_ctrl_panel($biz_ID);
+	}
+	public function show_prd_panel($biz_ID){
+		$data["products"] = $this->BA_model->load_products($biz_ID);
+		$data["prd_categories"] = $this->BA_model->load_prd_categories();
+		$data["biz_name"] = $this->session->userdata("biz_name");
+		$this->load->view('header_logged_in');
+		$this->load->view('client_prds_page',$data);
+		$this->load->view('footer');
+	}
+	public function add_products($mod = "1"){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$prd_ID = "PR00003";
+		if($mod == "1"){
+			$prd_pic = "no_image_thumb.jpg";
+			$prd_type = $this->input->post("prd-type");
+			$prd_name = $this->input->post("prd-name");
+			$prd_price = $this->input->post("prd-price");
+			$prd_quantity = $this->input->post("prd-quantity");
+			$prd_condition = $this->input->post("prd-condition");					
+			$prd_category = $this->input->post("prd-category");
+			$prd_description = $this->input->post("prd-description");
+			$prd_details = array(
+				"biz_ID" => $biz_ID,
+				"prd_ID" => $prd_ID,
+				"prd_name" => $prd_name,
+				"prd_price" => $prd_price,
+				"prd_quantity" => $prd_quantity,
+				"prd_condition" => $prd_condition,
+				"prd_type" => $prd_type,
+				"prd_description" => $prd_description
+			);
+			//$this->BA_model->add_products($prd_details,$prd_category,$prd_pic);
+		}
+		else if($mod == 2){
+			
+		}	
+		/*foreach ($prd_details as $key => $value){
+			echo $key . " -> " . $value . "<br>"; 	
+		}*/
+		//echo "category -> " . $prd_category . "<br>";
+		//echo "cond -> " . $this->input->post("prd-condition");		
+	}
+	public function edit_products($prd_ID){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$prd_pic = "no_image_thumb.jpg";
+		$prd_type = $this->input->post("prd-type");
+		$prd_name = $this->input->post("prd-name");
+		$prd_price = $this->input->post("prd-price");
+		$prd_quantity = $this->input->post("prd-quantity");
+		$prd_condition = $this->input->post("prd-condition");					
+		$prd_category = $this->input->post("prd-category");
+		$prd_description = $this->input->post("prd-description");
+		$prd_details = array(
+			"biz_ID" => $biz_ID,
+			"prd_ID" => $prd_ID,
+			"prd_name" => $prd_name,
+			"prd_price" => $prd_price,
+			"prd_quantity" => $prd_quantity,
+			"prd_condition" => $prd_condition,
+			"prd_type" => $prd_type,
+			"prd_description" => $prd_description
+		);
+		
 	}
 }
 	
