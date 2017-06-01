@@ -22,6 +22,9 @@
         <select class = "BA-select">
             <option disabled selected>Product type Filter</option>
         </select>
+        <select class = "BA-select">
+            <option disabled selected>Product category Filter</option>
+        </select>
         <button id = "add-new-products" class = "BA-button">&#10010; Add products</button>
     </section>
     <section class = "client-item-list-cont">	
@@ -34,22 +37,22 @@
         <div class = "list-column low-p"><span class = "BA-dark-orange">Controls</span></div>
         <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
     </div>
-    <?php foreach($products->result() as $row):?>
-    <div class = "list-row">
-    	<div class = "list-column"><span class = "BA-dark-green"><img id = '' class = 'prd-thumbnails' alt = '' src="<?php echo base_url(); ?>images/uploads/black_magic.jpg"></span></div>	
-        <div class = "list-column"><span class = "BA-green"><?=$row->prd_name?></span></div>
-        <div class = "list-column low-p"><span class = "BA-green"><?=$row->cat_name?></span></div>
-        <div class = "list-column"><span class = "BA-green"><span>MWK </span><span><?=$row->prd_price?></span></span></div>
-        <div class = "list-column low-p"><span class = "BA-green"><?=$row->prd_quantity?></span></div>
-        <div class = "list-column low-p">
-        	<div class = "ctrl-icons-cont">
-                <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn'>
-                <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-btn'>
+		<?php foreach($products->result() as $row):?>
+        <div class = "list-row">
+            <div class = "list-column"><span class = "BA-dark-green"><img id = '' class = 'prd-thumbnails' alt = '<?=$row->pic_name?>' src="<?php echo base_url(); ?>images/uploads/<?=$row->pic_name?>"></span></div>	
+            <div class = "list-column"><span class = "BA-green"><?=$row->prd_name?></span></div>
+            <div class = "list-column low-p"><span class = "BA-green"><?=$row->cat_name?></span></div>
+            <div class = "list-column"><span class = "BA-green"><span>MWK </span><span><?=$row->prd_price?></span></span></div>
+            <div class = "list-column low-p"><span class = "BA-green"><?=$row->prd_quantity?></span></div>
+            <div class = "list-column low-p">
+                <div class = "ctrl-icons-cont">
+                    <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn'>
+                    <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-btn'>
+                </div>
             </div>
+            <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
         </div>
-        <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
-    </div>
-    <?php endforeach;?>
+        <?php endforeach;?>
     </section>
 </section>
 

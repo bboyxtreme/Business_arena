@@ -180,7 +180,8 @@ class DBController extends CI_Controller {
 	public function login(){
 		$email = $this->input->post("email");
 		$password = $this->input->post("password");
-		$result = $this->BA_model->authenticate($email, $password);		
+		$result = $this->BA_model->authenticate($email, $password);	
+		echo $result->num_rows();	
 		if ($result->num_rows() == 1){
 			$user_ID = $result->row()->user_ID;
 			$user_type = $result->row()->user_type;
@@ -265,7 +266,7 @@ class DBController extends CI_Controller {
 	}
 	public function add_business(){
 		$user_ID = $this->session->userdata("user_ID");
-		$biz_ID = "BD00002";
+		$biz_ID = $this->generate_ID("business");
 		$biz_name = $this->input->post("biz-name");
 		$biz_slogan = $this->input->post("biz-slogan");
 		$biz_field = $this->input->post("biz-field");
@@ -309,9 +310,12 @@ class DBController extends CI_Controller {
 		$this->show_business_ctrl_panel($biz_ID);
 	}
 	public function show_prd_panel($biz_ID){
-		$data["products"] = $this->BA_model->load_products($biz_ID);
-		$data["prd_categories"] = $this->BA_model->load_prd_categories();
-		$data["biz_name"] = $this->session->userdata("biz_name");
+		$products = $this->BA_model->load_products($biz_ID);
+		
+			$data["products"] = $products;
+			$data["prd_categories"] = $this->BA_model->load_prd_categories();
+		
+		$data["biz_name"] = $this->session->userdata("biz_name");		
 		$this->load->view('header_logged_in');
 		$this->load->view('client_prds_page',$data);
 		$this->load->view('footer');
@@ -324,7 +328,10 @@ class DBController extends CI_Controller {
 				return $prd_ID;
 				break;
 			case "business" :
-				
+				$lastID = (int)(substr($this->BA_model->get_last_ID("businesses","biz_ID"),2));
+				$biz_ID = "BD" . sprintf("%05d",++$lastID);
+				return $biz_ID;
+				break;
 				break;
 			case "category" :
 				
@@ -346,7 +353,7 @@ class DBController extends CI_Controller {
 			{
 				$error = $this->upload->display_errors();
 				echo "You have successfully added a record but " . $error;
-				$prd_pic = "no_image_thumb.jpg";
+				$prd_pic = "no_image_thumb.gif";
 			}
 			else
 			{
@@ -370,7 +377,7 @@ class DBController extends CI_Controller {
 				"prd_type" => $prd_type,
 				"prd_description" => $prd_description
 			);
-			//$this->BA_model->add_products($prd_details,$prd_category,$prd_pic);
+			$this->BA_model->add_products($prd_details,$prd_category,$prd_pic);
 		}
 		else if($mod == 2){
 			$config['upload_path'] = './uploads/';
@@ -391,7 +398,7 @@ class DBController extends CI_Controller {
 					$prd_name = $data[0];                  	$prd_price = $data[1]; 
 					$prd_quantity = $data[2]; 				$prd_type = $data[3];  
 					$prd_category = $data[4]; 				$prd_condition = $data[5]; 
-					$prd_description = $data[6]; 			$prd_pic = "no_image_thumb.jpg";	
+					$prd_description = $data[6]; 			$prd_pic = "no_image_thumb.gif";	
 					$prd_ID = $this->generate_ID("product");	
 					$prd_details = array (
 						"prd_ID" => $prd_ID,
@@ -409,7 +416,8 @@ class DBController extends CI_Controller {
 					}
 					echo "<br>";*/
 				}
-				fclose($handle);				
+				fclose($handle);
+				unlink($upload_data['full_path']);				
 			}
 		}	
 	}
