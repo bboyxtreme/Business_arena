@@ -37,13 +37,19 @@
         <div class = "list-column low-p"><span class = "BA-dark-orange">Controls</span></div>
         <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
     </div>
+    <?php if(isset($no_products)): ?>
+    	<p class = "BA-dark-green"><?=$no_products?></p>
+    <?php else: ?>
 		<?php foreach($products->result() as $row):?>
         <div class = "list-row">
-            <div class = "list-column"><span class = "BA-dark-green"><img id = '' class = 'prd-thumbnails' alt = '<?=$row->pic_name?>' src="<?php echo base_url(); ?>images/uploads/<?=$row->pic_name?>"></span></div>	
+            <div class = "list-column"><img class = 'prd-thumbnails' alt = '<?=$row->pic_name?>' src="<?php echo base_url(); ?>images/uploads/<?=$row->pic_name?>"></div>	
             <div class = "list-column"><span class = "BA-green"><?=$row->prd_name?></span></div>
             <div class = "list-column low-p"><span class = "BA-green"><?=$row->cat_name?></span></div>
             <div class = "list-column"><span class = "BA-green"><span>MWK </span><span><?=$row->prd_price?></span></span></div>
             <div class = "list-column low-p"><span class = "BA-green"><?=$row->prd_quantity?></span></div>
+            <div class = "hidden"><span class = "BA-green"><?=$row->prd_type?></span></div>
+            <div class = "hidden"><span class = "BA-green"><?=$row->prd_description?></span></div>  
+            <div class = "hidden"><span class = "BA-green"><?=$row->prd_condition?></span></div>          
             <div class = "list-column low-p">
                 <div class = "ctrl-icons-cont">
                     <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn'>
@@ -53,6 +59,7 @@
             <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
         </div>
         <?php endforeach;?>
+    <?php endif; ?>
     </section>
 </section>
 
@@ -107,7 +114,7 @@
         <section class = "side-by-side-item">
         	<div class = "image-card">
                 <div class = "image">
-                    <img src="<?php echo base_url(); ?>images/uploads/black_magic.jpg">
+                    <img id = "edit-modal-img" src="">
                 </div>
                 <div class = "image-info">
                     <span class = "BA-dark-orange">Change photo: </span>
@@ -116,23 +123,25 @@
             </div>      	
         </section>
         <section class = "side-by-side-item vertical-align-flex-start">
-            <input type = "text" name = "prd-name" placeholder = "enter prd name" class = "BA-input margin-bottom-std"><br>
-            <input type = "text" name = "prd-price" placeholder = "enter prd Unit Price" class = "BA-input margin-bottom-std"><br>
-            <input type = "text" name = "prd-quantity" placeholder = "enter prd Quantit" class = "BA-input margin-bottom-std"><br>
-            <input type = "text" name = "prd-type" placeholder = "enter prd-type e.g. phone, trouser or camera" class = "BA-input margin-top-std"><br>
-            <select class = "BA-select margin-bottom-std" name = "prd-category">
+        	<?php echo form_open_multipart("DBController/add_products"); ?>
+            <input id = "edit-prd-name" type = "text" name = "prd-name" placeholder = "enter prd name" class = "BA-input margin-bottom-std"><br>
+            <input id = "edit-prd-price" type = "text" name = "prd-price" placeholder = "enter prd Unit Price" class = "BA-input margin-bottom-std"><br>
+            <input id = "edit-prd-quantity" type = "text" name = "prd-quantity" placeholder = "enter prd Quantit" class = "BA-input margin-bottom-std"><br>
+            <input id = "edit-prd-type" type = "text" name = "prd-type" placeholder = "enter prd-type e.g. phone, trouser or camera" class = "BA-input margin-bottom-std"><br>
+            <select id = "edit-prd-category" class = "BA-select margin-bottom-std" name = "prd-category">
                 <option selected disabled>Select Category</option>
                 <?php foreach($prd_categories->result() as $row): ?>
                     <option value = "<?=$row->cat_ID?>"><?=$row->cat_name?></option>
                 <?php endforeach; ?>
             </select><br>
-            <select name = "prd-condition" class = "BA-select margin-bottom-std">
+            <select id = "edit-prd-condition" name = "prd-condition" class = "BA-select margin-bottom-std">
                <option selected disabled>Select Condition</option>
-               <option>Brand new</option>
-               <option>Used</option>
+               <option value = "Brand new">Brand new</option>
+               <option value = "Used">Used</option>
             </select><br>
-            <textarea name = "prd-description" class = "BA-input margin-bottom-std no-resize _100pwidth" rows = 5 placeholder = "enter prd specifications"></textarea>
+            <textarea id = "edit-prd-description" name = "prd-description" class = "BA-input margin-bottom-std no-resize _100pwidth" rows = 5 placeholder = "enter prd specifications"></textarea>
             <input type = "submit" value = "Submit" class = "BA-button-large">
+            <? echo form_close(); ?>
         </section>
     </section>
     <!--<div class = "center-bottom-btn"></div><br>-->

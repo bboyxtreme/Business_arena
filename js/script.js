@@ -270,8 +270,17 @@ $(document).ready(function(){
 		$(".modal-BG").css("display","flex");
 	});	
 	$(".main-content-area").on("click",".edit-btn", function(){
+		//alert($(this).parent().parent().siblings().eq(7).children("span").text());
 		$(".modal-frame, .modal-frame-small").html($("#edit-prd").html());
 		$(".modal-BG").css("display","flex");
+		$("#edit-modal-img").attr("src",$(this).parent().parent().siblings().eq(0).children("img").attr("src"));
+		$("#edit-prd-name").val($(this).parent().parent().siblings().eq(1).children("span").text());
+		$("#edit-prd-price").val($(this).parent().parent().siblings().eq(3).children("span").text());
+		$("#edit-prd-quantity").val($(this).parent().parent().siblings().eq(4).children("span").text());
+		$("#edit-prd-type").val($(this).parent().parent().siblings().eq(5).children("span").text());
+		$("#edit-prd-description").val($(this).parent().parent().siblings().eq(6).children("span").text());	
+		$("#edit-prd-condition").val($(this).parent().parent().siblings().eq(7).children("span").text());	
+		$("#edit-prd-category").val("CAT001");
 	});
 	$(".main-content-area").on("click",".del-btn", function(){
 		$(".modal-frame, .modal-frame-small").html($("#del-prd").html());

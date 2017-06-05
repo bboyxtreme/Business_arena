@@ -311,10 +311,13 @@ class DBController extends CI_Controller {
 	}
 	public function show_prd_panel($biz_ID){
 		$products = $this->BA_model->load_products($biz_ID);
-		
+		if($products->num_rows() == 0){
+			$data["no_products"] = "This business doesn't have any products at the moment. Add some by clicking on the add products button now!!";
+		}
+		else{
 			$data["products"] = $products;
-			$data["prd_categories"] = $this->BA_model->load_prd_categories();
-		
+		}		
+		$data["prd_categories"] = $this->BA_model->load_prd_categories();		
 		$data["biz_name"] = $this->session->userdata("biz_name");		
 		$this->load->view('header_logged_in');
 		$this->load->view('client_prds_page',$data);
@@ -331,7 +334,6 @@ class DBController extends CI_Controller {
 				$lastID = (int)(substr($this->BA_model->get_last_ID("businesses","biz_ID"),2));
 				$biz_ID = "BD" . sprintf("%05d",++$lastID);
 				return $biz_ID;
-				break;
 				break;
 			case "category" :
 				
