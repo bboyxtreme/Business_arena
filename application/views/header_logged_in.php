@@ -16,7 +16,7 @@
 		<span id="main-menu-btn"> &#9776; </span>
 		<section id = "text">
 			<ul>
-				<li><a href="<?php echo base_url(); ?>" class = "general">Home</a></li>
+				<li><a href="<?php echo base_url("DBController/index/" . $this->session->userdata("user_type")); ?>" class = "general">Home</a></li>
 				<li><a id = "about-us" class = "general">About us</a></li>
 				<li><a id = "contact-us" class = "general">Contact us</a></li>
                 <li id = 'logout'><a href='http://Business_arena/logout'>Log out (<?php echo $this->session->userdata("first_name"); ?>)</a></li>

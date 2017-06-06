@@ -25,28 +25,31 @@ class DBController extends CI_Controller {
 		$this->load->helper('url');
 		$this->load->library('session');
 	}
-	public function index()//$log_status = "logged_out"
-	{
-		/*$user_type = $this->session->userdata("user_type");
-		if($user_type == "Business Owner" || $user_type == "Admin"){
-			$data["log_status"] = "logged in";
-		}else{
-			$data["log_status"] = $log_status;
-		}
-		if($user_type == "Business Owner"){
-			$this->load->view('header',$data);		
-			$this->load->view('home_page_bo');
+	public function index($user_type = "Customer")//$log_status = "logged_out"
+	{	
+		if ($user_type == "Customer"){
+			$this->load->view('header');		
+			$this->load->view('home_page_user');
+			$this->load->view('footer');
+		}	
+		else if ($user_type == "Business_Owner"){
+			$user_ID = $this->session->userdata("user_ID");
+			$businesses = $this->BA_model->load_business_info($user_ID);
+			if ($businesses->num_rows() == 0){
+				$data['no_businesses'] = "You do not have any businesses at the moment. Start by creating one now!";					
+			}
+			else{
+				$data['businesses'] = $businesses;
+			}
+			$this->load->view('header_logged_in');		
+			$this->load->view('home_page_bo',$data);
 			$this->load->view('footer');
 		}
-		else{
-			$this->load->view('header',$data);		
-			$this->load->view('home_page_user');
-			$this->load->view('footer');	
-		}*/
-		//$data["log_status"] = $log_status;	
-		$this->load->view('header');		
-		$this->load->view('home_page_user');
-		$this->load->view('footer');	
+		else if ($user_type == "Admin"){
+			$this->load->view('header_logged_in');		
+			$this->load->view('home_page_admin');
+			$this->load->view('footer');
+		}		
 	}
 	public function about_page(){
 		$this->load->view('header');
@@ -194,7 +197,7 @@ class DBController extends CI_Controller {
 				$this->load->view('home_page_admin');
 				$this->load->view('footer');				
 			}
-			else if ($user_type == "Buisness Owner"){
+			else if ($user_type == "Business_Owner"){
 				$this->initiate_sesstion($user_ID, $user_type, $first_name, $last_name);
 				$businesses = $this->BA_model->load_business_info($user_ID);
 				if ($businesses->num_rows() == 0){
