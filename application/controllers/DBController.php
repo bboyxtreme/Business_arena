@@ -25,14 +25,11 @@ class DBController extends CI_Controller {
 		$this->load->helper('url');
 		$this->load->library('session');
 	}
-	public function index($user_type = "Customer")//$log_status = "logged_out"
+	public function index()//$log_status = "logged_out"
 	{	
-		if ($user_type == "Customer"){
 			$this->load->view('header');		
-			$this->load->view('home_page_user');
-			$this->load->view('footer');
-		}	
 		else if ($user_type == "Business_Owner"){
+		if ($user_type == "Business_Owner"){
 			$user_ID = $this->session->userdata("user_ID");
 			$businesses = $this->BA_model->load_business_info($user_ID);
 			if ($businesses->num_rows() == 0){
@@ -48,6 +45,11 @@ class DBController extends CI_Controller {
 		else if ($user_type == "Admin"){
 			$this->load->view('header_logged_in');		
 			$this->load->view('home_page_admin');
+			$this->load->view('footer');
+		}
+		else{
+			$this->load->view('header');		
+			$this->load->view('home_page_user');
 			$this->load->view('footer');
 		}		
 	}
