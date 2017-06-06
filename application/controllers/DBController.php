@@ -423,9 +423,26 @@ class DBController extends CI_Controller {
 			}
 		}	
 	}
-	public function edit_products($prd_ID){
+	public function edit_product(){
+		$config['upload_path'] = './images/uploads/';
+		$config['allowed_types'] = 'jpg|gif|png';
+		$config['max_size']	= '1000';
+		$this->load->library('upload', $config);
+		if ( ! $this->upload->do_upload())
+		{
+			$error = $this->upload->display_errors();
+			//echo "You have successfully added a record but " . $error;
+			$prd_pic = $this->input->post("prd-pic");
+		}
+		else
+		{
+			$upload_data = $this->upload->data();
+			$prd_pic = $upload_data['file_name'];
+			$old_prd_pic = $upload_data['file_path'] . $this->input->post("prd-pic");
+			unlink($old_prd_pic);							
+		}	
 		$biz_ID = $this->session->userdata("biz_ID");
-		$prd_pic = "no_image_thumb.jpg";
+		$prd_ID = $this->input->post("prd-ID");
 		$prd_type = $this->input->post("prd-type");
 		$prd_name = $this->input->post("prd-name");
 		$prd_price = $this->input->post("prd-price");
@@ -434,8 +451,6 @@ class DBController extends CI_Controller {
 		$prd_category = $this->input->post("prd-category");
 		$prd_description = $this->input->post("prd-description");
 		$prd_details = array(
-			"biz_ID" => $biz_ID,
-			"prd_ID" => $prd_ID,
 			"prd_name" => $prd_name,
 			"prd_price" => $prd_price,
 			"prd_quantity" => $prd_quantity,
@@ -443,7 +458,8 @@ class DBController extends CI_Controller {
 			"prd_type" => $prd_type,
 			"prd_description" => $prd_description
 		);
-		
+		$this->BA_model->edit_product($prd_ID,$prd_details,$prd_category,$prd_pic);	
+		$this->show_prd_panel($biz_ID);	
 	}
 }
 	

@@ -558,7 +558,7 @@ tr.result:hover{
 	width: 49%;
 }
 .product-info p, .info-item-emboss{
-	text-align: center;
+	/*text-align: center;*/
 	background-color: rgb(255,255,255);
 	padding: 5px;
 	border: 2px outset white;
@@ -993,6 +993,9 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 .center{
 	text-align: center;
 }
+.float-left{
+	float: left;	
+}
 .center-content{
 	display: flex;
 	justify-content: center;
@@ -1197,7 +1200,7 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 		display: none;
 	}*/
 	.product-info, .product-image{
-		width: 50%;
+		width: 48%;
 	}
 	.product, .biz-main-ctrl-panel, .info-body{
 		display: flex;

@@ -275,16 +275,25 @@ $(document).ready(function(){
 		$(".modal-BG").css("display","flex");
 		$("#edit-modal-img").attr("src",$(this).parent().parent().siblings().eq(0).children("img").attr("src"));
 		$("#edit-prd-name").val($(this).parent().parent().siblings().eq(1).children("span").text());
-		$("#edit-prd-price").val($(this).parent().parent().siblings().eq(3).children("span").text());
+		$("#edit-prd-price").val($(this).parent().parent().siblings().eq(3).find("span#price-cont").text());
 		$("#edit-prd-quantity").val($(this).parent().parent().siblings().eq(4).children("span").text());
 		$("#edit-prd-type").val($(this).parent().parent().siblings().eq(5).children("span").text());
 		$("#edit-prd-description").val($(this).parent().parent().siblings().eq(6).children("span").text());	
 		$("#edit-prd-condition").val($(this).parent().parent().siblings().eq(7).children("span").text());	
+		$("#edit-prd-ID").val($(this).parent().parent().siblings().eq(8).children("span").text());	
+		$("#edit-pic-name").val($(this).parent().parent().siblings().eq(9).children("span").text());
 		$("#edit-prd-category").val("CAT001");
 	});
 	$(".main-content-area").on("click",".del-btn", function(){
 		$(".modal-frame, .modal-frame-small").html($("#del-prd").html());
 		$(".modal-BG").css("display","flex");
+		$("#del-modal-img").attr("src",$(this).parent().parent().siblings().eq(0).children("img").attr("src"));
+		$("#del-prd-name span").text($(this).parent().parent().siblings().eq(1).children("span").text());
+		$("#del-prd-price span").text($(this).parent().parent().siblings().eq(3).children("span").text());
+		$("#del-prd-quantity span").text($(this).parent().parent().siblings().eq(4).children("span").text());
+		$("#del-prd-type span").text($(this).parent().parent().siblings().eq(5).children("span").text());
+		$("#del-prd-condition span").text($(this).parent().parent().siblings().eq(7).children("span").text());
+		$("#del-prd-description span").text($(this).parent().parent().siblings().eq(6).children("span").text());	
 	});
 	
 	//Usage quota page

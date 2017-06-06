@@ -45,11 +45,13 @@
             <div class = "list-column"><img class = 'prd-thumbnails' alt = '<?=$row->pic_name?>' src="<?php echo base_url(); ?>images/uploads/<?=$row->pic_name?>"></div>	
             <div class = "list-column"><span class = "BA-green"><?=$row->prd_name?></span></div>
             <div class = "list-column low-p"><span class = "BA-green"><?=$row->cat_name?></span></div>
-            <div class = "list-column"><span class = "BA-green"><span>MWK </span><span><?=$row->prd_price?></span></span></div>
+            <div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont"><?=number_format((float)$row->prd_price,2)?></span></span></div>
             <div class = "list-column low-p"><span class = "BA-green"><?=$row->prd_quantity?></span></div>
             <div class = "hidden"><span class = "BA-green"><?=$row->prd_type?></span></div>
             <div class = "hidden"><span class = "BA-green"><?=$row->prd_description?></span></div>  
-            <div class = "hidden"><span class = "BA-green"><?=$row->prd_condition?></span></div>          
+            <div class = "hidden"><span class = "BA-green"><?=$row->prd_condition?></span></div> 
+            <div class = "hidden"><span class = "BA-green"><?=$row->prd_ID?></span></div>  
+            <div class = "hidden"><span class = "BA-green"><?=$row->pic_name?></span></div>        
             <div class = "list-column low-p">
                 <div class = "ctrl-icons-cont">
                     <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn'>
@@ -73,28 +75,28 @@
 	<span class = "modal-closebtn">&#10060;</span> 
         <p class = "title-strip h-font-size no-margin">ADD PRODUCTS</p>
         <div class = "info-body">        
-        <section class = "section-1 vertical-align">
-        	<?php echo form_open_multipart("DBController/add_products"); ?>
-                <p class = "BA-dark-orange info-item-emboss margin-top-std">Upload Single product</p>
-                <input type = "text" name = "prd-name" placeholder = "enter prd name" class = "BA-input margin-top-std"><br>
-                <input type = "text" name = "prd-price" placeholder = "enter prd Unit Price" class = "BA-input margin-top-std"><br>
-                <input type = "text" name = "prd-quantity" placeholder = "enter prd Quantit" class = "BA-input margin-top-std"><br>
-                <input type = "text" name = "prd-type" placeholder = "enter prd-type e.g. phone, trouser or camera" class = "BA-input margin-top-std"><br>
-                <select class = "BA-select margin-top-std" name = "prd-category">
-                    <option selected disabled>Select Category</option>
-                    <?php foreach($prd_categories->result() as $row): ?>
-                        <option value = "<?=$row->cat_ID?>"><?=$row->cat_name?></option>
-                    <?php endforeach; ?>
-                </select><br>
-                <select name = "prd-condition" class = "BA-select margin-top-std">
-                   <option selected disabled>Select Condition</option>
-                   <option>Brand new</option>
-                   <option>Used</option>
-                </select><br>
-                <textarea name = "prd-description" class = "BA-input margin-top-std no-resize _100pwidth" rows = 5 placeholder = "enter prd specifications"></textarea>
-                <p class = "BA-green">Upload picture (optional. can be done later at your own convinience</p>
-                <input type = "file" name = "userfile" class = "BA-input" class = "BA-input margin-bottom-std"><br><br>
-                <input type = "submit" value = "Submit" class = "BA-button-large margin-bottom-std">
+        <section class = "section-1 vertical-align">        	
+            <p class = "BA-dark-orange info-item-emboss margin-top-std">Upload Single product</p>
+            <?php echo form_open_multipart("DBController/add_products"); ?>
+            <input type = "text" name = "prd-name" placeholder = "enter prd name" class = "BA-input margin-top-std"><br>
+            <input type = "text" name = "prd-price" placeholder = "enter prd Unit Price" class = "BA-input margin-top-std"><br>
+            <input type = "text" name = "prd-quantity" placeholder = "enter prd Quantit" class = "BA-input margin-top-std"><br>
+            <input type = "text" name = "prd-type" placeholder = "enter prd-type e.g. phone, trouser or camera" class = "BA-input margin-top-std"><br>
+            <select class = "BA-select margin-top-std" name = "prd-category">
+                <option selected disabled>Select Category</option>
+                <?php foreach($prd_categories->result() as $row): ?>
+                    <option value = "<?=$row->cat_ID?>"><?=$row->cat_name?></option>
+                <?php endforeach; ?>
+            </select><br>
+            <select name = "prd-condition" class = "BA-select margin-top-std">
+               <option selected disabled>Select Condition</option>
+               <option>Brand new</option>
+               <option>Used</option>
+            </select><br>
+            <textarea name = "prd-description" class = "BA-input margin-top-std no-resize _100pwidth" rows = 5 placeholder = "enter prd specifications"></textarea>
+            <p class = "BA-green">Upload picture (optional. can be done later at your own convinience</p>
+            <input type = "file" name = "userfile" class = "BA-input" class = "BA-input margin-bottom-std"><br><br>
+            <input type = "submit" value = "Submit" class = "BA-button-large margin-bottom-std">
             <?php echo form_close(); ?>
         </section>
         <section class = "section-2 vertical-align">
@@ -110,6 +112,7 @@
 <div id = "edit-prd" style = "display: none;">
 	<span class = "modal-closebtn">&#10060;</span>
 	<p class = "title-strip h-font-size margin-bottom-std">EDIT PRODUCT</p>
+    <?php echo form_open_multipart("DBController/edit_product"); ?>
     <section class = "side-by-side-cont">
         <section class = "side-by-side-item">
         	<div class = "image-card">
@@ -117,33 +120,36 @@
                     <img id = "edit-modal-img" src="">
                 </div>
                 <div class = "image-info">
-                    <span class = "BA-dark-orange">Change photo: </span>
-                    <input type = "file" class = "BA-input margin-top-std">
+                    <span class = "BA-dark-orange">Change thumbnail: </span>
+                    <input type = "file" name = "userfile" class = "BA-input margin-top-std">
                 </div>  
             </div>      	
         </section>
-        <section class = "side-by-side-item vertical-align-flex-start">
-        	<?php echo form_open_multipart("DBController/add_products"); ?>
-            <input id = "edit-prd-name" type = "text" name = "prd-name" placeholder = "enter prd name" class = "BA-input margin-bottom-std"><br>
-            <input id = "edit-prd-price" type = "text" name = "prd-price" placeholder = "enter prd Unit Price" class = "BA-input margin-bottom-std"><br>
-            <input id = "edit-prd-quantity" type = "text" name = "prd-quantity" placeholder = "enter prd Quantit" class = "BA-input margin-bottom-std"><br>
-            <input id = "edit-prd-type" type = "text" name = "prd-type" placeholder = "enter prd-type e.g. phone, trouser or camera" class = "BA-input margin-bottom-std"><br>
-            <select id = "edit-prd-category" class = "BA-select margin-bottom-std" name = "prd-category">
+        <section class = "side-by-side-item">       
+            <input id = "edit-prd-name" type = "text" name = "prd-name" placeholder = "enter prd name" class = "_100pwidth BA-input margin-bottom-std"><br>
+            <input id = "edit-prd-price" type = "text" name = "prd-price" placeholder = "enter prd Unit Price" class = "_100pwidth BA-input margin-bottom-std"><br>
+            <input id = "edit-prd-quantity" type = "text" name = "prd-quantity" placeholder = "enter prd Quantit" class = "_100pwidth BA-input margin-bottom-std"><br>
+            <input id = "edit-prd-type" type = "text" name = "prd-type" placeholder = "enter prd-type e.g. phone, trouser or camera" class = "_100pwidth BA-input margin-bottom-std"><br>
+            <input id = "edit-prd-ID" type = "hidden" name = "prd-ID">
+            <input id = "edit-pic-name" type = "hidden" name = "prd-pic">
+            <select id = "edit-prd-category" class = "_100pwidth BA-select margin-bottom-std" name = "prd-category">
                 <option selected disabled>Select Category</option>
                 <?php foreach($prd_categories->result() as $row): ?>
                     <option value = "<?=$row->cat_ID?>"><?=$row->cat_name?></option>
                 <?php endforeach; ?>
             </select><br>
-            <select id = "edit-prd-condition" name = "prd-condition" class = "BA-select margin-bottom-std">
+            <select id = "edit-prd-condition" name = "prd-condition" class = "_100pwidth BA-select margin-bottom-std">
                <option selected disabled>Select Condition</option>
                <option value = "Brand new">Brand new</option>
                <option value = "Used">Used</option>
             </select><br>
-            <textarea id = "edit-prd-description" name = "prd-description" class = "BA-input margin-bottom-std no-resize _100pwidth" rows = 5 placeholder = "enter prd specifications"></textarea>
-            <input type = "submit" value = "Submit" class = "BA-button-large">
-            <? echo form_close(); ?>
+            <textarea id = "edit-prd-description" name = "prd-description" class = "BA-input margin-bottom-std no-resize _100pwidth" rows = 5 placeholder = "enter prd specifications"></textarea>        
         </section>
     </section>
+    <div class = "center-bottom-btn">
+    <input type = "submit" value = "Submit" class = "BA-button-large">
+    </div>
+    <? echo form_close(); ?>
     <!--<div class = "center-bottom-btn"></div><br>-->
 </div>
 
@@ -153,15 +159,17 @@
 	<p class = "title-strip h-font-size no-margin">DELETE PRODUCT</p>
         <p class = "BA-dark-orange">ARE YOU SURE YOU WANT TO DELETE THE FOLLWOING PRODUCT?</p>
         <div class = "info-body">        
-        <section class = "product-image">
-        	<img src="<?php echo base_url(); ?>images/uploads/black_magic.jpg">
-        </section>
-        <section class = "product-info">
-           	<p class = "BA-dark-orange">PRODUCT NAME</p>
-            <p class = "BA-green">PRICE</p>
-            <p class = "BA-dark-orange">QUANTITY</p>
-            <p class = "BA-green">BRAND NEW OR SECOND HAND</p>
-        </section>
+            <section class = "product-image">
+                <img id = "del-modal-img" src="">
+            </section>
+            <section class = "product-info">
+                <p id = "del-prd-name" class = "BA-dark-orange">PRODUCT NAME: <br><span></span></p>
+                <p id = "del-prd-price" class = "BA-green">PRICE: <br><span></span></p>
+                <p id = "del-prd-quantity" class = "BA-dark-orange">QUANTITY: <br><span></span></p>
+                <p id = "del-prd-type" class = "BA-green">TYPE: <br><span></span></p>
+                <p id = "del-prd-condition" class = "BA-dark-orange">CONDITION: <br><span></span></p>
+                <p id = "del-prd-description" class = "BA-green">DESCRIPTION: <br><span></span></p>
+            </section>
         </div>
         <div class = "right-align-content">
         <button class = "BA-button-large margin-top-extra margin-right-std">DELETE</button>

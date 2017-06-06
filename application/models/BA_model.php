@@ -87,13 +87,23 @@ class BA_model extends CI_Model {
 		);
 		return $cat_details;
 	}
-	public function add_products($prd_details,$prd_category,$prd_pic,$mod = true){
+	public function get_CAT($cat_ID){
+		$prd_categories = $this->load_prd_categories();
+		foreach ($prd_categories->result() as $row){
+			if ($cat_ID == $row->cat_ID){
+				$cat_name = $row->cat_name;
+				return $cat_name;
+			}
+		}
+		return $cat_ID;
+	}
+	public function add_products($prd_details,$prd_category,$prd_pic,$single_upload = true){
 		//update products
 		$this->insert_BA_data("business_products",$prd_details);
 		
 		
 		//update categories
-		if ($mod){
+		if ($single_upload){
 			$category = array(
 				"prd_ID" => $prd_details["prd_ID"],
 				"cat_ID" => $prd_category,
@@ -136,6 +146,44 @@ class BA_model extends CI_Model {
 		);
 		$this->insert_BA_data("prd_pictures",$pic_details);
 	}
+	public function edit_product($prd_ID,$prd_details,$prd_category,$prd_pic){
+		$where = array ("prd_ID" => $prd_ID);
+		
+		
+		//update products		
+		$this->update_BA_data("business_products",$prd_details,$where);
+		
+		
+		//update categories
+		$category_name = $this->get_CAT($prd_category);
+		$cat_details = $this->check_CAT($category_name);
+		if ($cat_details["mod"] == "existing_cat"){
+			$category = array(
+				"cat_ID" => $cat_details["cat_ID"],
+			);
+			$this->update_BA_data("product_product_category",$category,$where);
+		}
+		else if ($cat_details["mod"] == "new_cat"){
+			$category_add = array(
+				"cat_ID" => $cat_details["cat_ID"],
+				"cat_name" => $cat_details["cat_name"],
+				"confirm_status" => $cat_details["confrim_status"]
+			);
+			$this->insert_BA_data("product_categories",$category_add);
+			$category = array(
+				"cat_ID" => $cat_details["cat_ID"],
+			);
+			$this->update_BA_data("product_product_category",$category,$where);				
+		}		
+		
+		
+		//update picture	
+		$pic_details = array(
+			"pic_name" => $prd_pic,
+		);
+		$this->update_BA_data("prd_pictures",$pic_details,$where);
+	}
+	
 	public function insert_BA_data($table,$data){
 		$this->db->insert($table,$data);
 	}
