@@ -354,7 +354,7 @@ class DBController extends CI_Controller {
 			if ( ! $this->upload->do_upload())
 			{
 				$error = $this->upload->display_errors();
-				echo "You have successfully added a record but " . $error;
+				//echo "You have successfully added a record but " . $error;
 				$prd_pic = "no_image_thumb.gif";
 			}
 			else
@@ -380,6 +380,7 @@ class DBController extends CI_Controller {
 				"prd_description" => $prd_description
 			);
 			$this->BA_model->add_products($prd_details,$prd_category,$prd_pic);
+			$notification = "You have successfully added a product";
 		}
 		else if($mod == 2){
 			$config['upload_path'] = './uploads/';
@@ -412,16 +413,15 @@ class DBController extends CI_Controller {
 						"prd_condition" => $prd_condition,
 						"prd_description" => $prd_description,
 					);
-					$this->BA_model->add_products($prd_details,$prd_category,$prd_pic,false);
-					/*foreach ($product as $row){
-						echo $row . " ";
-					}
-					echo "<br>";*/
-				}
+					$this->BA_model->add_products($prd_details,$prd_category,$prd_pic,false);					
+				}	
+				$notification = "Your CSV file has successfully neen loaded";			
 				fclose($handle);
 				unlink($upload_data['full_path']);				
 			}
-		}	
+		}		
+		$this->session->set_userdata("notification",$notification);
+		$this->show_prd_panel($biz_ID);		
 	}
 	public function edit_product(){
 		$config['upload_path'] = './images/uploads/';
@@ -459,7 +459,55 @@ class DBController extends CI_Controller {
 			"prd_description" => $prd_description
 		);
 		$this->BA_model->edit_product($prd_ID,$prd_details,$prd_category,$prd_pic);	
+		$notification = "You have successfully edited your product";
+		$this->session->set_userdata("notification",$notification);
 		$this->show_prd_panel($biz_ID);	
+	}
+	public function del_prd($prd_ID){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$this->BA_model->delete_prd($biz_ID,$prd_ID);
+		$notification = "You have successfully deleted your product";
+		$this->session->set_userdata("notification",$notification);
+		$this->show_prd_panel($biz_ID);	
+	}
+	public function filter($type){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$srch_phrase = $this->input->post("search_string");
+		switch ($type){
+			case "client-prd-search" :
+				$products = $this->BA_model->load_products($biz_ID,"search",$srch_phrase);
+				$data["biz_name"] = $this->session->userdata("biz_name");
+				if($products->num_rows() == 0){
+					echo "No products found";
+				}
+				else{
+					$this->load_filtered_products($products);
+				}				
+				break;
+		}
+	}
+	public function load_filtered_products($products){
+		foreach($products->result() as $row){
+			echo '<div class = "list-row">';
+			echo '<div class = "list-column"><img class = "prd-thumbnails" alt = "' . $row->pic_name . '" src="' . base_url() . 'images/uploads/' . $row->pic_name . '"></div>';
+			echo '<div class = "list-column"><span class = "BA-green">' . $row->prd_name . '</span></div>';
+			echo '<div class = "list-column low-p"><span class = "BA-green">' . $row->cat_name . '</span></div>';
+			echo '<div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont">' . number_format((float)$row->prd_price,2) . '</span></span></div>';
+			echo '<div class = "list-column low-p"><span class = "BA-green">' . $row->prd_quantity . '</span></div>';
+			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_type . '</span></div>';
+			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_description . '</span></div>';  
+			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_condition . '</span></div>'; 
+			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_ID . '</span></div>';
+			echo '<div class = "hidden"><span class = "BA-green">' . $row->pic_name . '</span></div>';        
+			echo '<div class = "list-column low-p">';
+			echo '<div class = "ctrl-icons-cont">';
+			echo '<img id = "' . $row->prd_ID . '" src="' . base_url()  . 'images/edit.jpg" class="ctrl-icons edit-btn">';
+			echo '<img id = "' . base_url("DBController/del_prd/" . $row->prd_ID) . '" src="' . base_url() . 'images/delete.jpg" class="ctrl-icons del-btn">';
+			echo '</div>';
+			echo '</div>';
+			echo '<div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>';
+			echo '</div>';
+		}	
 	}
 }
 	

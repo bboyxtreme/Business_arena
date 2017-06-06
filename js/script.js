@@ -293,8 +293,51 @@ $(document).ready(function(){
 		$("#del-prd-quantity span").text($(this).parent().parent().siblings().eq(4).children("span").text());
 		$("#del-prd-type span").text($(this).parent().parent().siblings().eq(5).children("span").text());
 		$("#del-prd-condition span").text($(this).parent().parent().siblings().eq(7).children("span").text());
-		$("#del-prd-description span").text($(this).parent().parent().siblings().eq(6).children("span").text());	
+		$("#del-prd-description span").text($(this).parent().parent().siblings().eq(6).children("span").text());
+		//$("#del-prd-ID").text($(this).parent().parent().siblings().eq(8).children("span").text());	
+		$("#del-prd-delete-btn").attr("href",$(this).attr("id"));
 	});
+	$(".main-content-area").on("keyup","#client-prd-search", function(){
+		var str = $(this).val();
+		$.ajax({
+			type:'POST',
+			data: {search_string: str},
+			url:'http://Business_arena/index.php/DBController/filter/client-prd-search',
+			beforeSend: function(){
+				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
+			},
+			complete: function(){
+				$(".loader-thin").fadeOut("slow");
+			},
+			success: function(result){
+				$(".client-item-list-cont").html(result);
+			}
+		});
+	});
+	$(".main-content-area").on("change","#client-prd-type-filter", function(){
+		alert($(this).val());
+	});
+	$(".main-content-area").on("change","#client-prd-cat-filter", function(){
+		alert($(this).val());
+	});
+	/*$(".main-content-area").on("click","#del-prd-delete-btn", function(){
+		var prd_ID = $("#del-prd-ID").text();
+		$(".modal-BG").hide();
+		//ajax_update('http://Business_arena/index.php/DBController/del_prd/' + prd_ID);
+		$.ajax({
+			type:'POST',
+			url: 'http://Business_arena/index.php/DBController/del_prd/' + prd_ID,
+			beforeSend: function(){
+				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
+			},
+			success: function(result){
+				location.reload();							
+			},
+			error: function(xhr){
+				alert("An error occured: " + xhr.status + " " + xhr.statusText);
+			}
+		});
+	});*/
 	
 	//Usage quota page
 	$(".main-content-area").on("click",".buy-uq-btn",function(){

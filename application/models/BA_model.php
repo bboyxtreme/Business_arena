@@ -56,10 +56,23 @@ class BA_model extends CI_Model {
 		);
 		$this->update_BA_data("businesses",$biz_update_details,$where);
 	}
-	public function load_products($biz_ID, $mod = "all"){
-		$this->db->select("business_products.prd_ID,prd_name,prd_price,prd_quantity,cat_name,prd_type,prd_condition,prd_description,pic_name")->from("business_products")->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")->where("biz_ID", $biz_ID)->where("cat_usage","main");
-		$result = $this->db->get();
-		return $result;
+	public function load_products($biz_ID, $prd_select_type = "all", $search_phrase = ""){
+		if ($prd_select_type == "all"){
+			$this->db->select("business_products.prd_ID,prd_name,prd_price,prd_quantity,cat_name,prd_type,prd_condition,prd_description,pic_name")->from("business_products")->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")->where("biz_ID", $biz_ID)->where("cat_usage","main");
+			$result = $this->db->get();
+			return $result;	
+		}
+		else if ($prd_select_type == "search"){
+			$this->db->select("business_products.prd_ID,prd_name,prd_price,prd_quantity,cat_name,prd_type,prd_condition,prd_description,pic_name")->from("business_products")->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")->where("biz_ID", $biz_ID)->like("prd_name",$search_phrase)->where("cat_usage","main");
+			$result = $this->db->get();
+			return $result;	
+		}
+		else{
+			$this->db->select("business_products.prd_ID,prd_name,prd_price,prd_quantity,cat_name,prd_type,prd_condition,prd_description,pic_name")->from("business_products")->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")->where("biz_ID", $biz_ID)->where("business_products.prd_ID",$prd_select_type)->where("cat_usage","main");
+			$result = $this->db->get();
+			return $result;	
+		}
+		
 	}
 	public function load_prd_categories(){
 		$this->db->select("*")->from("product_categories")->where("confirm_status","confirmed");	
@@ -183,13 +196,32 @@ class BA_model extends CI_Model {
 		);
 		$this->update_BA_data("prd_pictures",$pic_details,$where);
 	}
-	
+	public function delete_prd($biz_ID,$prd_ID){
+		$where = array("prd_ID" => $prd_ID);
+		
+		//del prd picture. first delete record then delete assoicated picture stored on server
+		$pic_name = $this->load_products($biz_ID,$prd_ID)->row()->pic_name;
+		$this->del("prd_pictures",$where);	
+		if ($pic_name != "no_image_thumb.gif"){
+			$pic_name = "C:/wamp64/www/Business_arena/images/uploads/" . $pic_name;
+			unlink($pic_name);
+		}	
+		
+		//del prd category
+		$this->del("product_product_category",$where);
+		
+		//del prd
+		$this->del("business_products",$where);		
+	}
 	public function insert_BA_data($table,$data){
 		$this->db->insert($table,$data);
 	}
 	public function update_BA_data($table,$data,$where){
 		$this->db->where($where);
 		$this->db->update($table,$data);
+	}
+	public function del($tableName,$where){
+		$this->db->delete($tableName,$where);
 	}
 	public function get_last_ID($table,$column){
 		$this->db->select($column)->from($table)->order_by($column,"desc");

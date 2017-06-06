@@ -1,0 +1,5 @@
+Changes to be made
+1. base_url in config file
+2. ajax urls in scripts file.
+3. unlink url in delprd function in BA_model
+and maybe more.

@@ -17,6 +17,13 @@
 <div class = "loader hidden"><div></div></div>
 <div id = "loader" class = "hidden"><div class = "loader-thin"><div style = "margin: 50px auto 0;"></div></div></div>
 <div class = "website-loader BA-white-bg"><p class = "BA-green center h-font-size">Business Arena</p><div></div></div>
+<?php
+	$notification = $this->session->userdata("notification");
+	if (isset($notification)){
+		echo "<script>alert('" . $notification . "')</script>";
+	}
+	$this->session->unset_userdata("notification");
+?>
 <script src="<?php echo base_url();?>js/jquery.min.js"></script>	
 <script src="<?php echo base_url();?>js/script.js"></script>
 </body>

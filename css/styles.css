@@ -698,7 +698,9 @@ tr.result:hover{
 
 /*products page*/
 .client-item-list-cont{
-	min-height: 600px;	
+	min-height: 600px;
+	max-height: 725px;	
+	overflow-y: scroll;
 	padding: 5px;
 }
 .list-row, .list-header{

@@ -19,15 +19,34 @@
         <select class = "BA-select">
             <option disabled selected>Area Filter</option>
         </select>
-        <select class = "BA-select">
+        <select id = "client-prd-type-filter" class = "BA-select">
             <option disabled selected>Product type Filter</option>
+            <?php 
+			 $types = array();
+			 foreach($products->result() as $row){
+				 array_push($types,$row->prd_type); 
+			 }
+			 $types = array_unique($types);
+			 ?>               
+            <?php foreach($types as $row): ?>
+                <option><?=$row?></option>
+            <?php endforeach; ?>
         </select>
-        <select class = "BA-select">
+        <select id = "client-prd-cat-filter" class = "BA-select">
             <option disabled selected>Product category Filter</option>
+             <?php 
+			 $cats = array();
+			 foreach($products->result() as $row){
+				 array_push($cats,$row->cat_name); 
+			 }
+			 $cats = array_unique($cats);
+			 ?>               
+            <?php foreach($cats as $row): ?>
+                <option><?=$row?></option>
+            <?php endforeach; ?>
         </select>
         <button id = "add-new-products" class = "BA-button">&#10010; Add products</button>
     </section>
-    <section class = "client-item-list-cont">	
     <div class = "list-header">
     	<div class = "list-column"><span class = "BA-dark-orange">Thumbnail</span></div>	
         <div class = "list-column"><span class = "BA-dark-orange">Product Name</span></div>
@@ -37,6 +56,7 @@
         <div class = "list-column low-p"><span class = "BA-dark-orange">Controls</span></div>
         <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
     </div>
+    <section class = "client-item-list-cont">	    
     <?php if(isset($no_products)): ?>
     	<p class = "BA-dark-green"><?=$no_products?></p>
     <?php else: ?>
@@ -55,7 +75,7 @@
             <div class = "list-column low-p">
                 <div class = "ctrl-icons-cont">
                     <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn'>
-                    <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-btn'>
+                    <img id = '<?=base_url("DBController/del_prd/" . $row->prd_ID)?>' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-btn'>
                 </div>
             </div>
             <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
@@ -157,22 +177,23 @@
 <div id = "del-prd" style = "display: none;">
 	<span class = "modal-closebtn">&#10060;</span>
 	<p class = "title-strip h-font-size no-margin">DELETE PRODUCT</p>
-        <p class = "BA-dark-orange">ARE YOU SURE YOU WANT TO DELETE THE FOLLWOING PRODUCT?</p>
-        <div class = "info-body">        
-            <section class = "product-image">
-                <img id = "del-modal-img" src="">
-            </section>
-            <section class = "product-info">
-                <p id = "del-prd-name" class = "BA-dark-orange">PRODUCT NAME: <br><span></span></p>
-                <p id = "del-prd-price" class = "BA-green">PRICE: <br><span></span></p>
-                <p id = "del-prd-quantity" class = "BA-dark-orange">QUANTITY: <br><span></span></p>
-                <p id = "del-prd-type" class = "BA-green">TYPE: <br><span></span></p>
-                <p id = "del-prd-condition" class = "BA-dark-orange">CONDITION: <br><span></span></p>
-                <p id = "del-prd-description" class = "BA-green">DESCRIPTION: <br><span></span></p>
-            </section>
-        </div>
-        <div class = "right-align-content">
-        <button class = "BA-button-large margin-top-extra margin-right-std">DELETE</button>
-        <button class = "BA-button-orange-large margin-top-extra">CANCEL</button>
-        <div>        
+    <p class = "BA-dark-orange">ARE YOU SURE YOU WANT TO DELETE THE FOLLWOING PRODUCT?</p>
+    <div class = "info-body">        
+        <section class = "product-image">
+            <img id = "del-modal-img" src="">
+        </section>
+        <section class = "product-info">
+        	<p id = "del-prd-ID" class = "hidden"></p>
+            <p id = "del-prd-name" class = "BA-dark-orange">PRODUCT NAME: <br><span></span></p>
+            <p id = "del-prd-price" class = "BA-green">PRICE: <br><span></span></p>
+            <p id = "del-prd-quantity" class = "BA-dark-orange">QUANTITY: <br><span></span></p>
+            <p id = "del-prd-type" class = "BA-green">TYPE: <br><span></span></p>
+            <p id = "del-prd-condition" class = "BA-dark-orange">CONDITION: <br><span></span></p>
+            <p id = "del-prd-description" class = "BA-green">DESCRIPTION: <br><span></span></p>
+        </section>
+    </div>
+    <div class = "right-align-content">
+        <a id = "del-prd-delete-btn" href = "#"><button class = "BA-button-large margin-top-extra margin-right-std">DELETE</button></a>
+        <button id = "del-prd-cancel-btn" class = "BA-button-orange-large margin-top-extra">CANCEL</button>
+    <div>        
 </div>
