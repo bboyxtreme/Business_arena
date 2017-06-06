@@ -20,7 +20,7 @@
             <option disabled selected>Area Filter</option>
         </select>
         <select id = "client-prd-type-filter" class = "BA-select">
-            <option disabled selected>Product type Filter</option>
+            <option disabled selected>Product type Filter</option>            
             <?php 
 			 $types = array();
 			 foreach($products->result() as $row){
@@ -31,9 +31,10 @@
             <?php foreach($types as $row): ?>
                 <option><?=$row?></option>
             <?php endforeach; ?>
+            <option value = "" class = "BA-orange">Remove type filters</option>
         </select>
         <select id = "client-prd-cat-filter" class = "BA-select">
-            <option disabled selected>Product category Filter</option>
+            <option disabled selected>Product category Filter</option>            
              <?php 
 			 $cats = array();
 			 foreach($products->result() as $row){
@@ -44,6 +45,7 @@
             <?php foreach($cats as $row): ?>
                 <option><?=$row?></option>
             <?php endforeach; ?>
+            <option value = "" class = "BA-orange">Remove category filters</option>
         </select>
         <button id = "add-new-products" class = "BA-button">&#10010; Add products</button>
     </section>

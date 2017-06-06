@@ -87,7 +87,7 @@ class BA_model extends CI_Model {
 				->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
 				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
 				->where("biz_ID", $biz_ID)
-				->where("prd_type",$search_phrase)
+				->like("prd_type",$search_phrase)
 				->where("cat_usage","main");
 			$result = $this->db->get();
 			return $result;	
@@ -98,7 +98,7 @@ class BA_model extends CI_Model {
 				->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
 				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
 				->where("biz_ID", $biz_ID)
-				->where("cat_name",$search_phrase)
+				->like("cat_name",$search_phrase)
 				->where("cat_usage","main");
 			$result = $this->db->get();
 			return $result;	
