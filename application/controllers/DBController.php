@@ -484,6 +484,26 @@ class DBController extends CI_Controller {
 					$this->load_filtered_products($products);
 				}				
 				break;
+			case "client-prd-type-filter" :
+				$products = $this->BA_model->load_products($biz_ID,"prd-type-filter",$srch_phrase);
+				$data["biz_name"] = $this->session->userdata("biz_name");
+				if($products->num_rows() == 0){
+					echo "No products found";
+				}
+				else{
+					$this->load_filtered_products($products);
+				}				
+				break;
+			case "client-prd-cat-filter" :
+				$products = $this->BA_model->load_products($biz_ID,"prd-cat-filter",$srch_phrase);
+				$data["biz_name"] = $this->session->userdata("biz_name");
+				if($products->num_rows() == 0){
+					echo "No products found";
+				}
+				else{
+					$this->load_filtered_products($products);
+				}				
+				break;
 		}
 	}
 	public function load_filtered_products($products){

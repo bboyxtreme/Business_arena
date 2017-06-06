@@ -57,22 +57,63 @@ class BA_model extends CI_Model {
 		$this->update_BA_data("businesses",$biz_update_details,$where);
 	}
 	public function load_products($biz_ID, $prd_select_type = "all", $search_phrase = ""){
+		$select = array("business_products.prd_ID","prd_name","prd_price","prd_quantity","cat_name","prd_type",
+						"prd_condition","prd_description","pic_name");
+						
 		if ($prd_select_type == "all"){
-			$this->db->select("business_products.prd_ID,prd_name,prd_price,prd_quantity,cat_name,prd_type,prd_condition,prd_description,pic_name")->from("business_products")->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")->where("biz_ID", $biz_ID)->where("cat_usage","main");
+			$this->db->select($select)->from("business_products")
+				->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
+				->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
+				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
+				->where("biz_ID", $biz_ID)
+				->where("cat_usage","main");
 			$result = $this->db->get();
 			return $result;	
 		}
 		else if ($prd_select_type == "search"){
-			$this->db->select("business_products.prd_ID,prd_name,prd_price,prd_quantity,cat_name,prd_type,prd_condition,prd_description,pic_name")->from("business_products")->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")->where("biz_ID", $biz_ID)->like("prd_name",$search_phrase)->where("cat_usage","main");
+			$this->db->select($select)->from("business_products")
+				->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
+				->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
+				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
+				->where("biz_ID", $biz_ID)
+				->like("prd_name",$search_phrase)
+				->where("cat_usage","main");
+			$result = $this->db->get();
+			return $result;	
+		}
+		else if ($prd_select_type == "prd-type-filter"){
+			$this->db->select($select)->from("business_products")
+				->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
+				->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
+				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
+				->where("biz_ID", $biz_ID)
+				->where("prd_type",$search_phrase)
+				->where("cat_usage","main");
+			$result = $this->db->get();
+			return $result;	
+		}
+		else if ($prd_select_type == "prd-cat-filter"){
+			$this->db->select($select)->from("business_products")
+				->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
+				->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
+				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
+				->where("biz_ID", $biz_ID)
+				->where("cat_name",$search_phrase)
+				->where("cat_usage","main");
 			$result = $this->db->get();
 			return $result;	
 		}
 		else{
-			$this->db->select("business_products.prd_ID,prd_name,prd_price,prd_quantity,cat_name,prd_type,prd_condition,prd_description,pic_name")->from("business_products")->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")->where("biz_ID", $biz_ID)->where("business_products.prd_ID",$prd_select_type)->where("cat_usage","main");
+			$this->db->select($select)->from("business_products")
+				->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
+				->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
+				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
+				->where("biz_ID", $biz_ID)
+				->where("business_products.prd_ID",$prd_select_type)
+				->where("cat_usage","main");
 			$result = $this->db->get();
 			return $result;	
-		}
-		
+		}	
 	}
 	public function load_prd_categories(){
 		$this->db->select("*")->from("product_categories")->where("confirm_status","confirmed");	

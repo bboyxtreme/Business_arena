@@ -315,10 +315,38 @@ $(document).ready(function(){
 		});
 	});
 	$(".main-content-area").on("change","#client-prd-type-filter", function(){
-		alert($(this).val());
+		var str = $(this).val();
+		$.ajax({
+			type:'POST',
+			data: {search_string: str},
+			url:'http://Business_arena/index.php/DBController/filter/client-prd-type-filter',
+			beforeSend: function(){
+				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
+			},
+			complete: function(){
+				$(".loader-thin").fadeOut("slow");
+			},
+			success: function(result){
+				$(".client-item-list-cont").html(result);
+			}
+		});
 	});
 	$(".main-content-area").on("change","#client-prd-cat-filter", function(){
-		alert($(this).val());
+		var str = $(this).val();
+		$.ajax({
+			type:'POST',
+			data: {search_string: str},
+			url:'http://Business_arena/index.php/DBController/filter/client-prd-cat-filter',
+			beforeSend: function(){
+				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
+			},
+			complete: function(){
+				$(".loader-thin").fadeOut("slow");
+			},
+			success: function(result){
+				$(".client-item-list-cont").html(result);
+			}
+		});
 	});
 	/*$(".main-content-area").on("click","#del-prd-delete-btn", function(){
 		var prd_ID = $("#del-prd-ID").text();
