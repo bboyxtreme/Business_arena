@@ -27,8 +27,11 @@
             </div>
             <div class = "biz-ctrl-panel-image-edit">
             	<p class = "no-margin">Change photo</p>
-                <input type = "file"><br>
-                <input type = "submit" value="Upload" class = "BA-button">
+                <?php echo form_open_multipart("DBController/update_biz_picture/"); ?>
+                <input type = "file" name = "userfile"><br>
+                <input type = "hidden" name = "biz-pic" value = "<?php echo $biz_info->biz_picture_name; ?>">
+                <input type = "submit" value="Change" class = "BA-button">
+                <?php echo form_close(); ?>
             </div>
         </div>
         </section>
@@ -37,9 +40,9 @@
         <p class = "BA-dark-orange center">CONTROLS</p>
         <div class = "main-func-container">
             <a href="<?php echo base_url("DBController/show_prd_panel/" . $biz_info->biz_ID);?>"><button class = "biz-func-button-main">PRODUCTS</button></a>
-            <a href=""><button id = "ctrl-panel-Locs" class = "biz-func-button-main">LOCATIONS</button></a>
+            <a href="<?php echo base_url("DBController/show_loc_panel/" . $biz_info->biz_ID);?>"><button class = "biz-func-button-main">LOCATIONS</button></a>
         </div>
-        <button id = "ctrl-panel-views" class = "biz-func-button BA-white">VIEWS</button>
+        <a href="<?php echo base_url("DBController/show_views_panel/" . $biz_info->biz_ID);?>"><button class = "biz-func-button BA-white">VIEWS</button></a>
         <button id = "ctrl-panel-uq" class = "biz-func-button BA-dark-orange">USAGE QUOTA</button>
         <button id = "ctrl-panel-msgs" class = "biz-func-button BA-white">MESSAGES</button>
         </section>

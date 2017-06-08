@@ -25,8 +25,7 @@ class DBController extends CI_Controller {
 		$this->load->helper('url');
 		$this->load->library('session');
 	}
-	public function index($user_type = "Customer")//$log_status = "logged_out"
-	{	
+	public function index($user_type = "Customer"){	
 		if ($user_type == "Customer"){
 			$this->load->view('header');		
 			$this->load->view('home_page_user');
@@ -76,6 +75,36 @@ class DBController extends CI_Controller {
 		$this->load->view('business_control_panel',$data);
 		$this->load->view('footer');		
 	}
+	public function update_biz_picture(){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$config['upload_path'] = './images/uploads/';
+		$config['allowed_types'] = 'jpg|gif|png';
+		$config['max_size']	= '1000';
+		$this->load->library('upload', $config);
+		if ( ! $this->upload->do_upload())
+		{
+			$error = $this->upload->display_errors();
+			$data['notification'] = "The file you uploaded is either";
+			//echo "You have successfully added a record but " . $error;
+			$biz_pic = "no_biz_image.jpg";
+		}
+		else
+		{
+			$upload_data = $this->upload->data();
+			$biz_pic = $upload_data['file_name'];	
+			$old_biz_pic = $this->input->post("biz-pic");
+			if ($old_biz_pic != "no_biz_image.jpg"){
+				$old_biz_pic = $upload_data['file_path'] . $old_biz_pic;
+				unlink($old_biz_pic);	
+			}						
+		}
+		$udpate_details = array("biz_picture_name"=>$biz_pic);
+		$where = array("biz_ID" => $biz_ID);
+		$this->BA_model->update_BA_data("businesses",$udpate_details,$where);		
+		$notification = "You have successfully changed your business picture!!";
+		$this->session->set_userdata("notification",$notification);
+		$this->show_business_ctrl_panel($biz_ID);
+	}
 	public function show_product($business_name,$product_name){
 		//cho $business_name . "<br>" . $product_name;
 		$this->load->view('header');
@@ -94,8 +123,7 @@ class DBController extends CI_Controller {
 		$this->load("searchresults");
 		$this->load->view('footer');*/
 	}
-	public function load($page)
-	{
+	public function load($page){
 		if ($page == "about-us"){
 			echo "Home >> About us inde";
 		}
@@ -326,6 +354,48 @@ class DBController extends CI_Controller {
 		$this->load->view('client_prds_page',$data);
 		$this->load->view('footer');
 	}
+	public function show_loc_panel($biz_ID){
+		$locations = $this->BA_model->load_locations($biz_ID);
+		if($locations->num_rows() == 0){
+			$data["no_locations"] = "Your business doesn't have any locations. Add a location now and give your business exposure via catalogue and location search mechanisms";
+		}
+		else{
+			$data["locations"] = $locations;
+		}				
+		$data["biz_name"] = $this->session->userdata("biz_name");		
+		$this->load->view('header_logged_in');
+		$this->load->view('client_locs_page',$data);
+		$this->load->view('footer');
+	}
+	public function show_views_panel($biz_ID){
+		$data['views'] = $this->BA_model->load_business_views($biz_ID);
+		$business_categories = $this->BA_model->load_prd_categories($biz_ID);			
+		$product_views = $this->BA_model->load_prdouct_views($biz_ID);
+		$cat_views = array();	
+		foreach ($business_categories->result() as $cat){
+			echo $cat->cat_name;
+			$found = 0;
+			foreach ($product_views->result() as $views){
+				if($cat->cat_name == $views->cat_name){
+					array_push($cat_views,$views->num_views);
+					$found = 1;
+					//echo "found";
+				}
+			}
+			if($found != 1){
+				array_push($cat_views,0);
+				//echo "not found";
+			}				
+			//echo "<br>";		
+		}
+		//print_r($cat_views);
+		$data["cat_views"] = $cat_views;	
+		$data["business_categories"] = $business_categories;			
+		$data["biz_name"] = $this->session->userdata("biz_name");		
+		$this->load->view('header_logged_in');
+		$this->load->view('client_views_page',$data);
+		$this->load->view('footer');
+	}
 	public function generate_ID($mod){
 		switch ($mod){
 			case "product" :
@@ -342,7 +412,9 @@ class DBController extends CI_Controller {
 				
 				break;
 			case "location" :
-				
+				$lastID = (int)(substr($this->BA_model->get_last_ID("business_locations","loc_ID"),2));
+				$loc_ID = "BL" . sprintf("%05d",++$lastID);
+				return $loc_ID;
 				break;				
 		}
 	}
@@ -426,6 +498,25 @@ class DBController extends CI_Controller {
 		$this->session->set_userdata("notification",$notification);
 		$this->show_prd_panel($biz_ID);		
 	}
+	public function add_location(){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$loc_ID = $this->generate_ID("location");
+		$loc_area = $this->input->post("loc-area");
+		$loc_district = $this->input->post("loc-district");
+		$loc_country = $this->input->post("loc-country");
+		$loc_description = $this->input->post("loc-description");
+		$loc_details = array(
+			"loc_ID" => $loc_ID,
+			"loc_area" => $loc_area,
+			"loc_district" => $loc_district,
+			"loc_country" => $loc_country,
+			"loc_description" => $loc_description
+		);	
+		$this->BA_model->add_location($biz_ID,$loc_details);
+		$notification = "You have successfully added a location";
+		$this->session->set_userdata("notification",$notification);
+		$this->show_loc_panel($biz_ID);
+	}
 	public function edit_product(){
 		$config['upload_path'] = './images/uploads/';
 		$config['allowed_types'] = 'jpg|gif|png';
@@ -442,7 +533,9 @@ class DBController extends CI_Controller {
 			$upload_data = $this->upload->data();
 			$prd_pic = $upload_data['file_name'];
 			$old_prd_pic = $upload_data['file_path'] . $this->input->post("prd-pic");
-			unlink($old_prd_pic);							
+			if ($old_prd_pic != "no_image_thumb.gif"){
+				unlink($old_prd_pic);				
+			}							
 		}	
 		$biz_ID = $this->session->userdata("biz_ID");
 		$prd_ID = $this->input->post("prd-ID");
@@ -466,12 +559,38 @@ class DBController extends CI_Controller {
 		$this->session->set_userdata("notification",$notification);
 		$this->show_prd_panel($biz_ID);	
 	}
+	public function edit_location(){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$loc_ID = $this->input->post("loc-ID");
+		$loc_area = $this->input->post("loc-area");
+		$loc_district = $this->input->post("loc-district");
+		$loc_country = $this->input->post("loc-country");
+		$loc_description = $this->input->post("loc-description");
+		$loc_details = array(
+			"loc_ID" => $loc_ID,
+			"loc_area" => $loc_area,
+			"loc_district" => $loc_district,
+			"loc_country" => $loc_country,
+			"loc_description" => $loc_description
+		);
+		$this->BA_model->edit_loc($loc_details);	
+		$notification = "You have successfully edited your location";
+		$this->session->set_userdata("notification",$notification);
+		$this->show_loc_panel($biz_ID);	
+	}
 	public function del_prd($prd_ID){
 		$biz_ID = $this->session->userdata("biz_ID");
 		$this->BA_model->delete_prd($biz_ID,$prd_ID);
 		$notification = "You have successfully deleted your product";
 		$this->session->set_userdata("notification",$notification);
 		$this->show_prd_panel($biz_ID);	
+	}
+	public function del_loc($loc_ID){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$this->BA_model->delete_loc($biz_ID,$loc_ID);
+		$notification = "You have successfully deleted your location";
+		$this->session->set_userdata("notification",$notification);
+		$this->show_loc_panel($biz_ID);	
 	}
 	public function filter($type){
 		$biz_ID = $this->session->userdata("biz_ID");
@@ -507,6 +626,17 @@ class DBController extends CI_Controller {
 					$this->load_filtered_products($products);
 				}				
 				break;
+			case "client-loc-search" :
+				$locations = $this->BA_model->load_locations($biz_ID, $srch_phrase);
+				$data["biz_name"] = $this->session->userdata("biz_name");
+				if($locations->num_rows() == 0){
+					echo "No locations found";
+				}
+				else{
+					//echo $locations->num_rows();
+					$this->load_filtered_locations($locations);
+				}
+				break;
 		}
 	}
 	public function load_filtered_products($products){
@@ -524,13 +654,36 @@ class DBController extends CI_Controller {
 			echo '<div class = "hidden"><span class = "BA-green">' . $row->pic_name . '</span></div>';        
 			echo '<div class = "list-column low-p">';
 			echo '<div class = "ctrl-icons-cont">';
-			echo '<img id = "' . $row->prd_ID . '" src="' . base_url()  . 'images/edit.jpg" class="ctrl-icons edit-btn">';
-			echo '<img id = "' . base_url("DBController/del_prd/" . $row->prd_ID) . '" src="' . base_url() . 'images/delete.jpg" class="ctrl-icons del-btn">';
+			echo '<img id = "' . $row->prd_ID . '" src="' . base_url()  . 'images/edit.jpg" class="ctrl-icons edit-btn prd">';
+			echo '<img id = "' . base_url("DBController/del_prd/" . $row->prd_ID) . '" src="' . base_url() . 'images/delete.jpg" class="ctrl-icons del-btn prd">';
 			echo '</div>';
 			echo '</div>';
 			echo '<div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>';
 			echo '</div>';
 		}	
+	}
+	public function load_filtered_locations($locations){
+		foreach($locations->result() as $row){
+			echo '<div class = "list-row">';
+			echo '<div class = "list-column"><span class = "BA-green">' . $row->loc_area . '</span></div>';
+			echo '<div class = "list-column"><span class = "BA-green">' . $row->loc_district . '</span></div>';
+			echo '<div class = "list-column"><span class = "BA-green">' . $row->loc_description . '</span></div>';		
+			echo '<div class = "list-column low-p"><span class = "BA-green">' . $row->loc_country. '</span></div>';  
+			echo '<div class = "hidden"><span class = "BA-green">' . $row->loc_ID . '</span></div>';       
+			echo '<div class = "list-column low-p">';
+			echo '<div class = "ctrl-icons-cont">';
+			echo '<img id = "" src="' . base_url()  . 'images/edit.jpg" class="ctrl-icons edit-btn loc">';
+			echo '<img id = "' . base_url("DBController/del_loc/" . $row->loc_ID) . '" src="' . base_url() . 'images/delete.jpg" class="ctrl-icons del-btn loc">';
+			echo '</div>';
+			echo '</div>';
+			echo '<div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>';
+			echo '</div>';
+		}	
+	}
+	public function load_product_views(){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$category = $this->input->post("search_string");
+		$product_views = $this->BA_model->load_prdouct_views($biz_ID,$category);
 	}
 }
 	

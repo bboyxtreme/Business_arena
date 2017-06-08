@@ -23,8 +23,10 @@
             <option disabled selected>Product type Filter</option>            
             <?php 
 			 $types = array();
-			 foreach($products->result() as $row){
-				 array_push($types,$row->prd_type); 
+			 if(!isset($no_products)){
+				 foreach($products->result() as $row){
+					 array_push($types,$row->prd_type); 
+				 }
 			 }
 			 $types = array_unique($types);
 			 ?>               
@@ -37,8 +39,10 @@
             <option disabled selected>Product category Filter</option>            
              <?php 
 			 $cats = array();
-			 foreach($products->result() as $row){
-				 array_push($cats,$row->cat_name); 
+			 if(!isset($no_products)){
+				 foreach($products->result() as $row){
+					 array_push($cats,$row->cat_name); 
+				 }
 			 }
 			 $cats = array_unique($cats);
 			 ?>               
@@ -76,8 +80,8 @@
             <div class = "hidden"><span class = "BA-green"><?=$row->pic_name?></span></div>        
             <div class = "list-column low-p">
                 <div class = "ctrl-icons-cont">
-                    <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn'>
-                    <img id = '<?=base_url("DBController/del_prd/" . $row->prd_ID)?>' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-btn'>
+                    <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn prd'>
+                    <img id = '<?=base_url("DBController/del_prd/" . $row->prd_ID)?>' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-btn prd'>
                 </div>
             </div>
             <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>

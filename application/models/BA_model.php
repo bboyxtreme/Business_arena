@@ -50,6 +50,16 @@ class BA_model extends CI_Model {
 		);
 		return $result;
 	}
+	public function load_prdouct_views($biz_ID, $mod = "category"){		
+		$this->db->select('cat_name, count(*) as num_views')->from('users_view_products')
+				->join("business_products","business_products.prd_ID = users_view_products.prd_ID")
+				->join("product_product_category", "business_products.prd_ID = product_product_category.prd_ID")
+				->join("product_categories", "product_product_category.cat_ID = product_categories.cat_ID")
+				->where("biz_ID",$biz_ID)
+				->group_by("cat_name");
+		$result = $this->db->get();
+		return $result;
+	}
 	public function update_biz_info($biz_ID,$biz_update_details){
 		$where = array(
 			"biz_ID" => $biz_ID
@@ -115,9 +125,44 @@ class BA_model extends CI_Model {
 			return $result;	
 		}	
 	}
-	public function load_prd_categories(){
-		$this->db->select("*")->from("product_categories")->where("confirm_status","confirmed");	
-		$result = $this->db->get();
+	public function load_locations($biz_ID, $search_phrase = "all"){
+		$select = array("businesses.biz_ID","biz_name","business_locations.loc_ID","loc_area","loc_district","loc_country",
+						"loc_description");
+		if($search_phrase == "all"){
+			$this->db->select($select)->from("business_locations")
+				->join("businesses_has_business_locations","business_locations.loc_ID = businesses_has_business_locations.loc_ID")
+				->join("businesses","businesses_has_business_locations.biz_ID = businesses.biz_ID")
+				->where("businesses.biz_ID", $biz_ID);
+			$result = $this->db->get();
+			return $result;		
+		}
+		else{
+			$this->db->select($select)->from("business_locations")
+				->join("businesses_has_business_locations","business_locations.loc_ID = businesses_has_business_locations.loc_ID")
+				->join("businesses","businesses_has_business_locations.biz_ID = businesses.biz_ID")
+				->where("businesses.biz_ID", $biz_ID)
+				->group_start()
+					->like("loc_area", $search_phrase)
+					->or_like("loc_district", $search_phrase)
+					->or_like("loc_country", $search_phrase)
+					->or_like("loc_description", $search_phrase)
+				->group_end();
+			$result = $this->db->get();
+			return $result;
+		}			
+	}
+	public function load_prd_categories($biz_ID = "all"){
+		if($biz_ID == "all"){
+			$this->db->select("*")->from("product_categories")->where("confirm_status","confirmed");	
+			$result = $this->db->get();	
+		}
+		else{
+			$this->db->select("cat_name")->distinct()->from("business_products")
+			->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
+			->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
+			->where("biz_ID",$biz_ID);	
+			$result = $this->db->get();	
+		}		
 		return $result;
 	}
 	public function check_CAT($cat){
@@ -200,13 +245,22 @@ class BA_model extends CI_Model {
 		);
 		$this->insert_BA_data("prd_pictures",$pic_details);
 	}
-	public function edit_product($prd_ID,$prd_details,$prd_category,$prd_pic){
-		$where = array ("prd_ID" => $prd_ID);
+	public function add_location($biz_ID,$loc_details){
+		//update locations
+		$this->insert_BA_data("business_locations",$loc_details);
 		
+		//update relationship table
+		$rel_table = array(
+			"biz_ID" => $biz_ID,
+			"loc_ID" => $loc_details['loc_ID']
+		);		
+		$this->insert_BA_data("businesses_has_business_locations",$rel_table);
+	}
+	public function edit_product($prd_ID,$prd_details,$prd_category,$prd_pic){
+		$where = array ("prd_ID" => $prd_ID);		
 		
 		//update products		
-		$this->update_BA_data("business_products",$prd_details,$where);
-		
+		$this->update_BA_data("business_products",$prd_details,$where);		
 		
 		//update categories
 		$category_name = $this->get_CAT($prd_category);
@@ -237,6 +291,10 @@ class BA_model extends CI_Model {
 		);
 		$this->update_BA_data("prd_pictures",$pic_details,$where);
 	}
+	public function edit_loc($loc_details){
+		$where = array("loc_ID" => $loc_details["loc_ID"]);
+		$this->update_BA_data("business_locations",$loc_details,$where);
+	}
 	public function delete_prd($biz_ID,$prd_ID){
 		$where = array("prd_ID" => $prd_ID);
 		
@@ -254,6 +312,15 @@ class BA_model extends CI_Model {
 		//del prd
 		$this->del("business_products",$where);		
 	}
+	public function delete_loc($biz_ID,$loc_ID){		
+		$where = array("loc_ID" => $loc_ID,"biz_ID" => $biz_ID);		
+		//del loc relationship
+		$this->del("businesses_has_business_locations",$where);	
+		
+		$where = array("loc_ID" => $loc_ID);		
+		//del loc
+		$this->del("business_locations",$where);			
+	}
 	public function insert_BA_data($table,$data){
 		$this->db->insert($table,$data);
 	}
@@ -266,7 +333,13 @@ class BA_model extends CI_Model {
 	}
 	public function get_last_ID($table,$column){
 		$this->db->select($column)->from($table)->order_by($column,"desc");
-		$result = $this->db->get()->row()->$column;
+		$last_record = $this->db->get();
+		if ($last_record->num_rows() == 0){
+			$result = 0;				
+		}
+		else{
+			$result = $last_record->row()->$column;
+		}		
 		return $result;		
 	}
 /*	public function retrieve($tableName,$columns,$where){

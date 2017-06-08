@@ -827,6 +827,10 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 
 
 /*General styles*/
+.inline{
+	display: block;
+	width: 100%;	
+}
 .no-resize{
 	resize: none;
 }
@@ -1314,6 +1318,10 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 	}
 	.h-font-size{
 		font-size: 30px;
+	}
+	.inline{
+		display: inline-block;
+		width: auto;	
 	}
 }
 /*

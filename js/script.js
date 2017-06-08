@@ -269,7 +269,7 @@ $(document).ready(function(){
 		$(".modal-frame, .modal-frame-small").html($("#add-prds").html());
 		$(".modal-BG").css("display","flex");
 	});	
-	$(".main-content-area").on("click",".edit-btn", function(){
+	$(".main-content-area").on("click",".edit-btn.prd", function(){
 		//alert($(this).parent().parent().siblings().eq(7).children("span").text());
 		$(".modal-frame, .modal-frame-small").html($("#edit-prd").html());
 		$(".modal-BG").css("display","flex");
@@ -284,7 +284,7 @@ $(document).ready(function(){
 		$("#edit-pic-name").val($(this).parent().parent().siblings().eq(9).children("span").text());
 		$("#edit-prd-category").val("CAT001");
 	});
-	$(".main-content-area").on("click",".del-btn", function(){
+	$(".main-content-area").on("click",".del-btn.prd", function(){
 		$(".modal-frame, .modal-frame-small").html($("#del-prd").html());
 		$(".modal-BG").css("display","flex");
 		$("#del-modal-img").attr("src",$(this).parent().parent().siblings().eq(0).children("img").attr("src"));
@@ -293,16 +293,22 @@ $(document).ready(function(){
 		$("#del-prd-quantity span").text($(this).parent().parent().siblings().eq(4).children("span").text());
 		$("#del-prd-type span").text($(this).parent().parent().siblings().eq(5).children("span").text());
 		$("#del-prd-condition span").text($(this).parent().parent().siblings().eq(7).children("span").text());
-		$("#del-prd-description span").text($(this).parent().parent().siblings().eq(6).children("span").text());
-		//$("#del-prd-ID").text($(this).parent().parent().siblings().eq(8).children("span").text());	
+		$("#del-prd-description span").text($(this).parent().parent().siblings().eq(6).children("span").text());	
 		$("#del-prd-delete-btn").attr("href",$(this).attr("id"));
 	});
 	$(".main-content-area").on("keyup","#client-prd-search", function(){
 		var str = $(this).val();
+		ajax_search(str,"Business_arena/index.php/DBController/filter/client-prd-search")
+	});
+	$(".main-content-area").on("keyup","#client-loc-search", function(){
+		var str = $(this).val();
+		ajax_search(str,"http://Business_arena/index.php/DBController/filter/client-loc-search")
+	});
+	function ajax_search(str,url_string){
 		$.ajax({
 			type:'POST',
 			data: {search_string: str},
-			url:'http://Business_arena/index.php/DBController/filter/client-prd-search',
+			url: url_string,
 			beforeSend: function(){
 				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
 			},
@@ -313,30 +319,21 @@ $(document).ready(function(){
 				$(".client-item-list-cont").html(result);
 			}
 		});
-	});
+	}
 	$(".main-content-area").on("change","#client-prd-type-filter", function(){
 		var str = $(this).val();
-		$.ajax({
-			type:'POST',
-			data: {search_string: str},
-			url:'http://Business_arena/index.php/DBController/filter/client-prd-type-filter',
-			beforeSend: function(){
-				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
-			},
-			complete: function(){
-				$(".loader-thin").fadeOut("slow");
-			},
-			success: function(result){
-				$(".client-item-list-cont").html(result);
-			}
-		});
+		ajax_search(str,"http://Business_arena/index.php/DBController/filter/client-prd-type-filter");
 	});
 	$(".main-content-area").on("change","#client-prd-cat-filter", function(){
 		var str = $(this).val();
+		ajax_search(str,"http://Business_arena/index.php/DBController/filter/client-prd-cat-filter");
+	});	
+	$(".main-content-area").on("change","#client-views-selector", function(){
+		var str = $(this).val();
 		$.ajax({
 			type:'POST',
 			data: {search_string: str},
-			url:'http://Business_arena/index.php/DBController/filter/client-prd-cat-filter',
+			url:'http://Business_arena/index.php/DBController/load_product_views',
 			beforeSend: function(){
 				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
 			},
@@ -344,9 +341,28 @@ $(document).ready(function(){
 				$(".loader-thin").fadeOut("slow");
 			},
 			success: function(result){
-				$(".client-item-list-cont").html(result);
+				$(".chart-area").html(result);
 			}
 		});
+	});
+	$(".main-content-area").on("click",".edit-btn.loc", function(){
+		//alert($(this).parent().parent().siblings().eq(4).children("span").text());
+		$(".modal-frame, .modal-frame-small").html($("#edit-loc").html());
+		$(".modal-BG").css("display","flex");
+		$("#edit-loc-area").val($(this).parent().parent().siblings().eq(0).children("span").text());
+		$("#edit-loc-district").val($(this).parent().parent().siblings().eq(1).children("span").text());
+		$("#edit-loc-description").val($(this).parent().parent().siblings().eq(2).children("span").text());
+		$("#edit-loc-country").val($(this).parent().parent().siblings().eq(3).children("span").text());
+		$("#edit-loc-id").val($(this).parent().parent().siblings().eq(4).children("span").text());
+	});
+	$(".main-content-area").on("click",".del-btn.loc", function(){
+		$(".modal-frame, .modal-frame-small").html($("#del-loc").html());
+		$(".modal-BG").css("display","flex");
+		$("#del-loc-area span").text($(this).parent().parent().siblings().eq(0).children("span").text());
+		$("#del-loc-district span").text($(this).parent().parent().siblings().eq(1).children("span").text());
+		$("#del-loc-description span").text($(this).parent().parent().siblings().eq(2).children("span").text());
+		$("#del-loc-country span").text($(this).parent().parent().siblings().eq(3).children("span").text());
+		$("#del-loc-btn").attr("href",$(this).attr("id"));
 	});
 	/*$(".main-content-area").on("click","#del-prd-delete-btn", function(){
 		var prd_ID = $("#del-prd-ID").text();
