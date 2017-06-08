@@ -5,11 +5,11 @@
                 <?php echo "Zest Shop >> Views"; ?> 
             </p>	
         </header>
-        <header id="search" >
-            <input id = "prdUserSearch" name = "search" type = "text" placeholder = "&#128269; Search...">		
-        </header>
     </header>
     <p class = "side-by-side-item info-item-emboss margin-top-std BA-dark-orange" style = "text-align: left;"><?php echo date("F j, Y"); ?></p>
+    <div class = "center-content">
+    	<p class = "info-item-emboss margin-top-std BA-dark-orange inline">BUISNESS VIEWS</p>
+    </div>
     <section class = "side-by-side-cont">
         <p class = "side-by-side-item info-item-emboss margin-top-std BA-green">Todays's views: <span class = "BA-dark-orange"><?php echo $views['today_views']; ?></span></p>
         <p class = "side-by-side-item info-item-emboss margin-top-std BA-green">Total views: <span class = "BA-dark-orange"><?php echo $views['total_views']; ?></span></p>

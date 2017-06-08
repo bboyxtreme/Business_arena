@@ -684,6 +684,35 @@ class DBController extends CI_Controller {
 		$biz_ID = $this->session->userdata("biz_ID");
 		$category = $this->input->post("search_string");
 		$product_views = $this->BA_model->load_prdouct_views($biz_ID,$category);
+		$products = $this->BA_model->load_products($biz_ID,"prd-cat-filter",$category);
+		$cat_views = array();	
+		foreach ($products->result() as $prd_name){
+			$found = 0;
+			foreach ($product_views->result() as $views){
+				if($prd_name->prd_name == $views->prd_name){
+					array_push($cat_views,$views->num_views);
+					$found = 1;
+				}
+			}
+			if($found != 1){
+				array_push($cat_views,0);
+			}					
+		}
+		echo '<div class = "border-white-right padding-std" style = "display: inline-block;">';
+        echo '    <p class = "BA-white">Category Name</p>';
+        foreach($products->result() as $row){
+            echo '<p class = "BA-green">' . $row->prd_name . '</p>';
+        }
+        echo '</div><div class = "border-white-right padding-std" style = "display: inline-block;">';
+        echo '    <p class = "BA-white">VIEWS</p>';
+        foreach($cat_views as $row){
+            echo '<p class = "BA-yellow center">' . $row . '</p>';
+        }
+        echo '</div>';	
+		/*$counter = 0;
+		foreach($products->result() as $row){
+			echo $row->prd_name . " " . $cat_views[$counter++] . "<br>";
+		}*/
 	}
 }
 	

@@ -341,7 +341,7 @@ $(document).ready(function(){
 				$(".loader-thin").fadeOut("slow");
 			},
 			success: function(result){
-				$(".chart-area").html(result);
+				$(".chart").html(result);
 			}
 		});
 	});

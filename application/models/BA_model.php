@@ -50,14 +50,26 @@ class BA_model extends CI_Model {
 		);
 		return $result;
 	}
-	public function load_prdouct_views($biz_ID, $mod = "category"){		
-		$this->db->select('cat_name, count(*) as num_views')->from('users_view_products')
+	public function load_prdouct_views($biz_ID, $category = "all categories"){
+		if($category == "all categories"){
+			$this->db->select('cat_name, count(*) as num_views')->from('users_view_products')
 				->join("business_products","business_products.prd_ID = users_view_products.prd_ID")
 				->join("product_product_category", "business_products.prd_ID = product_product_category.prd_ID")
 				->join("product_categories", "product_product_category.cat_ID = product_categories.cat_ID")
 				->where("biz_ID",$biz_ID)
 				->group_by("cat_name");
-		$result = $this->db->get();
+			$result = $this->db->get();	
+		}
+		else{
+			$this->db->select('prd_name, count(*) as num_views')->from('users_view_products')
+				->join("business_products","business_products.prd_ID = users_view_products.prd_ID")
+				->join("product_product_category", "business_products.prd_ID = product_product_category.prd_ID")
+				->join("product_categories", "product_product_category.cat_ID = product_categories.cat_ID")
+				->where("biz_ID",$biz_ID)
+				->where("cat_name",$category)
+				->group_by("prd_name");
+			$result = $this->db->get();
+		}
 		return $result;
 	}
 	public function update_biz_info($biz_ID,$biz_update_details){
@@ -124,6 +136,13 @@ class BA_model extends CI_Model {
 			$result = $this->db->get();
 			return $result;	
 		}	
+	}
+	public function load_prd_names($biz_ID){
+		$this->db->select("prd_name")
+			->from("business_products")
+			->where("biz_ID",$biz_ID);
+		$result = $this->db->get();
+		return $result;
 	}
 	public function load_locations($biz_ID, $search_phrase = "all"){
 		$select = array("businesses.biz_ID","biz_name","business_locations.loc_ID","loc_area","loc_district","loc_country",
