@@ -683,17 +683,18 @@ tr.result:hover{
 .biz-ctrl-panel-image{
 	display: flex;
 	justify-content: flex-start;
+	flex-direction: column;
 }
 .biz-ctrl-panel-image-cont{
-	max-width: 50%;	
-	margin-right: 10px;
+	max-width: 100%;	
+	margin-bottom: 10px;
 }
 .biz-ctrl-panel-image-cont img{
 	max-width: 100%;	
-	max-height: 100px;
+	max-height: 200px;
 }
 .biz-ctrl-panel-image-edit{
-	max-width: 50%;	
+	max-width: 100%;	
 }
 
 /*products page*/
@@ -1235,7 +1236,7 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 	}
 	.modal-frame-small{
 		width: 40%;
-		min-height: 60%;
+		min-height: 40%;
 	}
 	.businesses{	
 		justify-content: space-between; 
@@ -1323,7 +1324,24 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 		display: inline-block;
 		width: auto;	
 	}
-}
+	.biz-ctrl-panel-image{
+		display: flex;
+		justify-content: flex-start;
+		flex-direction: row;
+	}
+	.biz-ctrl-panel-image-cont{
+		max-width: 50%;	
+		margin-right: 10px;
+		margin-bottom: 0;
+	}
+	.biz-ctrl-panel-image-cont img{
+		max-width: 100%;	
+		max-height: 200px;
+	}
+	.biz-ctrl-panel-image-edit{
+		max-width: 50%;	
+	}
+	}
 /*
 .money-BG{
 	background-image: url("Background2.jpg");

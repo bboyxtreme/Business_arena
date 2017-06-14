@@ -14,7 +14,7 @@
         <p class = "BA-green biz-info-item">Business details<br>
         <span class = "BA-green label">Name: </span><span id = "client-biz-name-label" class = "BA-dark-orange"><?php echo $biz_info->biz_name; ?></span><br>
         <span class = "BA-green label">Slogain: </span><span id = "client-biz-slogan-label" class = "BA-dark-orange"><?php echo $biz_info->biz_slogan; ?></span><br>
-        <span class = "BA-green label">Field: </span><span id = "client-biz-field-label" class = "BA-dark-orange"><?php echo $biz_info->biz_main_field; ?></span><br>
+        <span class = "BA-green label">Field: </span><span id = "client-biz-field-label" class = "BA-dark-orange"><?php echo $biz_info->biz_main_field; ?></span> <button id = "add-field-btn" class = "BA-button">&#10010; Add Field</button><br>
         <span class = "BA-green label">Mobile: </span><span id = "client-biz-mobile-label" class = "BA-dark-orange"><?php echo $biz_info->biz_main_mobile; ?></span><br>
         <span class = "BA-green label">Email: </span><span  id = "client-biz-email-label"class = "BA-dark-orange"><?php echo $biz_info->biz_main_email; ?></span><br>
         <button id = "edit-biz-details-btn" class = "BA-button">Edit</button>
@@ -43,7 +43,7 @@
             <a href="<?php echo base_url("DBController/show_loc_panel/" . $biz_info->biz_ID);?>"><button class = "biz-func-button-main">LOCATIONS</button></a>
         </div>
         <a href="<?php echo base_url("DBController/show_views_panel/" . $biz_info->biz_ID);?>"><button class = "biz-func-button BA-white">VIEWS</button></a>
-        <button id = "ctrl-panel-uq" class = "biz-func-button BA-dark-orange">USAGE QUOTA</button>
+        <a href="<?php echo base_url("DBController/show_uq_panel/" . $biz_info->biz_ID);?>"><button class = "biz-func-button BA-dark-orange">USAGE QUOTA</button></a>
         <button id = "ctrl-panel-msgs" class = "biz-func-button BA-white">MESSAGES</button>
         </section>
     </section>

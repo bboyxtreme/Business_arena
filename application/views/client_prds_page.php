@@ -16,8 +16,12 @@
         <option>Add products</option>
     </select>-->
     <section class = "filters">
-        <select class = "BA-select">
+        <select id = "client-prd-area-filter" class = "BA-select">
             <option disabled selected>Area Filter</option>
+            <?php foreach($locations->result() as $row): ?>
+                <option value = "<?=$row->loc_ID?>"><?=$row->loc_area?></option>
+            <?php endforeach; ?>
+            <option value = "" class = "BA-orange">Remove location filter</option>
         </select>
         <select id = "client-prd-type-filter" class = "BA-select">
             <option disabled selected>Product type Filter</option>            
@@ -71,13 +75,14 @@
             <div class = "list-column"><img class = 'prd-thumbnails' alt = '<?=$row->pic_name?>' src="<?php echo base_url(); ?>images/uploads/<?=$row->pic_name?>"></div>	
             <div class = "list-column"><span class = "BA-green"><?=$row->prd_name?></span></div>
             <div class = "list-column low-p"><span class = "BA-green"><?=$row->cat_name?></span></div>
-            <div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont"><?=number_format((float)$row->prd_price,2)?></span></span></div>
+            <div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont"><?=number_format((float)$row->prd_price,2)?></span></span><span class = "hidden"><?=$row->prd_price?></span></div>
             <div class = "list-column low-p"><span class = "BA-green"><?=$row->prd_quantity?></span></div>
             <div class = "hidden"><span class = "BA-green"><?=$row->prd_type?></span></div>
             <div class = "hidden"><span class = "BA-green"><?=$row->prd_description?></span></div>  
             <div class = "hidden"><span class = "BA-green"><?=$row->prd_condition?></span></div> 
             <div class = "hidden"><span class = "BA-green"><?=$row->prd_ID?></span></div>  
-            <div class = "hidden"><span class = "BA-green"><?=$row->pic_name?></span></div>        
+            <div class = "hidden"><span class = "BA-green"><?=$row->pic_name?></span></div> 
+            <div class = "hidden"><span class = "BA-green"><?=$row->loc_ID?></span></div>       
             <div class = "list-column low-p">
                 <div class = "ctrl-icons-cont">
                     <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn prd'>
@@ -108,6 +113,12 @@
             <input type = "text" name = "prd-price" placeholder = "enter prd Unit Price" class = "BA-input margin-top-std"><br>
             <input type = "text" name = "prd-quantity" placeholder = "enter prd Quantit" class = "BA-input margin-top-std"><br>
             <input type = "text" name = "prd-type" placeholder = "enter prd-type e.g. phone, trouser or camera" class = "BA-input margin-top-std"><br>
+            <select class = "BA-select margin-top-std" name = "prd-loc-ID">
+                <option selected disabled>Select Area</option>
+                <?php foreach($all_locations->result() as $row): ?>
+                    <option value = "<?=$row->loc_ID?>"><?=$row->loc_area?></option>
+                <?php endforeach; ?>
+            </select><br>
             <select class = "BA-select margin-top-std" name = "prd-category">
                 <option selected disabled>Select Category</option>
                 <?php foreach($prd_categories->result() as $row): ?>
@@ -129,6 +140,13 @@
            	<p class = "BA-dark-orange info-item-emboss margin-top-std">OR Upload Excel Doc</p><br><br>
             <?php echo form_open_multipart("DBController/add_products/2"); ?>
             <input type = "file" name = "userfile" class = "BA-input margin-top-std">
+            <p class = "no-margin BA-dark-orange">Select area below to which the uploaded products should be assigned</p>
+            <select class = "BA-select margin-top-std _100pwidth" name = "prd-loc-ID">
+                <option selected disabled>Select Area</option>
+                <?php foreach($all_locations->result() as $row): ?>
+                    <option value = "<?=$row->loc_ID?>"><?=$row->loc_area?></option>
+                <?php endforeach; ?>
+            </select><br>
             <input type = "submit" value = "Upload" class = "BA-button-large margin-top-std">
             <?php echo form_close(); ?>
         </section>
@@ -158,6 +176,12 @@
             <input id = "edit-prd-type" type = "text" name = "prd-type" placeholder = "enter prd-type e.g. phone, trouser or camera" class = "_100pwidth BA-input margin-bottom-std"><br>
             <input id = "edit-prd-ID" type = "hidden" name = "prd-ID">
             <input id = "edit-pic-name" type = "hidden" name = "prd-pic">
+            <select id = "edit-prd-area" class = "_100pwidth BA-select margin-bottom-std" name = "prd-category">
+                <option selected disabled>Select Area</option>
+                <?php foreach($all_locations->result() as $row): ?>
+                    <option value = "<?=$row->loc_ID?>"><?=$row->loc_area?></option>
+                <?php endforeach; ?>
+            </select><br>
             <select id = "edit-prd-category" class = "_100pwidth BA-select margin-bottom-std" name = "prd-category">
                 <option selected disabled>Select Category</option>
                 <?php foreach($prd_categories->result() as $row): ?>

@@ -37,8 +37,9 @@
         <select id = "client-views-selector" class = "side-by-side-item BA-select BA-dark-orange" style = "text-align: left;">
         	<option disabled selected>Chart category selector</option>
             <?php foreach($business_categories->result() as $row): ?>
-            	<option><?=$row->cat_name?></option>
+            	<option><?=$row->cat_name?></option>                
             <?php endforeach; ?>
+            <option value = "all categories">Remove Category filter</option>
         </select>
     </section>
 </section>

@@ -10,35 +10,34 @@
         </header>
     </header>
     <section class = "side-by-side-cont">
-        <p class = "side-by-side-item info-item-emboss margin-top-std BA-dark-orange" style = "text-align: left;">DATE</p>
-        <p class = "side-by-side-item info-item-emboss margin-top-std BA-dark-orange" style = "text-align: left;">USAGE QUOTA BALANCE</p>
+        <p class = "side-by-side-item info-item-emboss margin-top-std BA-dark-orange" style = "text-align: left;"><?php echo date("F j, Y"); ?></p>
+        <p class = "side-by-side-item info-item-emboss margin-top-std BA-dark-orange" style = "text-align: left;">USAGE QUOTA BALANCE: <span class = "BA-green bold"><?php echo $usage_quota; ?>  days left</span></p>
     </section>
     <section class = "side-by-side-cont margin-top-std">
     	<section class = "side-by-side-item">
         	<p class = "info-item-emboss BA-green">Quota subscriptions</p>
             <div class = "card-display-cont">
+            	<?php foreach($subscriptions["usage quota"]->result() as $row): ?>
             	<div class = "card-dispay-box margin-bottom-std vertical-align">
-                	<p class = "no-margin small-font-size BA-green center">1 Month</p>
-                    <p class = "no-margin small-font-size BA-dark-orange center">K5000</p>
+                	<p class = "no-margin small-font-size BA-green center"><?=$row->subscr_name?></p>
+                    <p class = "no-margin small-font-size BA-dark-orange center"><?=$row->subscr_price?></p>
                     <p class = "no-margin tiny-font-size BA-dark-green center green-highlight">View description</p>
                     <button class = "tiny-font-size BA-button _100pwidth buy-uq-btn">BUY</button>
                 </div>
-                <div class = "card-dispay-box margin-bottom-std vertical-align">
-                	<p class = "no-margin small-font-size BA-green center">1 Month</p>
-                    <p class = "no-margin medium-font-size BA-dark-orange center">K5000</p>
-                    <button class = "tiny-font-size BA-button _100pwidth buy-uq-btn">Buy</button>
-                </div>
+       			<?php endforeach; ?>
             </div>
         </section>
         <section class = "side-by-side-item">
         	<p class = "info-item-emboss BA-green">Market Boost subcriptions</p>
              <div class = "card-display-cont">
-            	<div class = "card-dispay-box margin-bottom-std">
-                
-                </div>
-                <div class = "card-dispay-box margin-bottom-std">
-                
-                </div>
+            	 <?php foreach($subscriptions["market boost"]->result() as $row): ?>
+                    <div class = "card-dispay-box margin-bottom-std vertical-align">
+                        <p class = "no-margin small-font-size BA-green center"><?=$row->subscr_name?></p>
+                        <p class = "no-margin small-font-size BA-dark-orange center"><?=$row->subscr_price?></p>
+                        <p class = "no-margin tiny-font-size BA-dark-green center green-highlight">View description</p>
+                        <button class = "tiny-font-size BA-button _100pwidth buy-uq-btn">BUY</button>
+                    </div>
+       			<?php endforeach; ?>
             </div>
         </section>
     </section>
@@ -56,7 +55,7 @@
                 	<p class = "info-item-emboss margin-top-std BA-dark-orange">Price</p>
                     <section class = "border-orange margin-top-std">
                     	<p class = "title-strip BA-dark-orange-bg BA-white small-font-size no-margin">Make Payment</p>
-                        <div id ="make-payment-cont" class = "padding-std border">
+                        <div id ="make-payment-cont" class = "padding-std">
                             
                         </div>
                     </section>

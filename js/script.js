@@ -2,6 +2,9 @@ $(document).ready(function(){
 	$(window).load(function(){
 		$(".website-loader").fadeOut("slow");	
 	});
+	$("body").on("click","#back-button, #success-confirmation",function(){
+		window.history.back();
+	});
 	/*catalogue scripts*/
 	//view catalog buttons
 	$(".catbtn-mobile, #user-view-catalogue").click(function(){
@@ -50,10 +53,7 @@ $(document).ready(function(){
 		change_nav("business");					
 		ajax_update('http://Business_arena/index.php/DBController/load/business');
 	});
-	$("#back-button").click(function(){
-		alert("back");	
-	});
-	$(document).on("click",".cat-biz-name",function(){		
+	$("body").on("click",".cat-biz-name",function(){		
 		change_nav("business");
 		if($(window).width() < 700){
 			$(".catalogue-cont-mobile").hide();
@@ -61,7 +61,7 @@ $(document).ready(function(){
 		}
 		ajax_update('http://Business_arena/index.php/DBController/load/business');		
 	});
-	$(document).on("click",".product-name",function(){
+	$("body").on("click",".product-name",function(){
 		change_nav("product");
 		$(document).scrollTop(0);
 		ajax_update('http://Business_arena/index.php/DBController/load/product');
@@ -213,9 +213,7 @@ $(document).ready(function(){
 		$(document).scrollTop(0);
 		ajax_update('http://Business_arena/index.php/DBController/load/biz_ctrl_panel');
 	});*/
-	$("#client-add-business").click(function(){
-		alert();
-	});
+
 	//Control panel
 	$(".main-content-area").on("click","#ctrl-panel-prds",function(){
 		$(document).scrollTop(0);
@@ -263,6 +261,10 @@ $(document).ready(function(){
 			$("input[name='biz-mobile']").val($("#client-biz-mobile-label").text());
 			$("input[name='biz-email']").val($("#client-biz-email-label").text());
 	});
+	$(".main-content-area").on("click","#add-field-btn",function(){
+		alert();
+		//ajax_update('http://Business_arena/index.php/DBController/load/msgs-ctrl-panel');	
+	});
 	
 	//Products page and Locations page
 	$(".main-content-area").on("click","#add-new-products, #add-new-location", function(){
@@ -275,9 +277,10 @@ $(document).ready(function(){
 		$(".modal-BG").css("display","flex");
 		$("#edit-modal-img").attr("src",$(this).parent().parent().siblings().eq(0).children("img").attr("src"));
 		$("#edit-prd-name").val($(this).parent().parent().siblings().eq(1).children("span").text());
-		$("#edit-prd-price").val($(this).parent().parent().siblings().eq(3).find("span#price-cont").text());
+		$("#edit-prd-price").val($(this).parent().parent().siblings().eq(3).find("span.hidden").text());
 		$("#edit-prd-quantity").val($(this).parent().parent().siblings().eq(4).children("span").text());
 		$("#edit-prd-type").val($(this).parent().parent().siblings().eq(5).children("span").text());
+		$("#edit-prd-area").val($(this).parent().parent().siblings().eq(10).children("span").text());
 		$("#edit-prd-description").val($(this).parent().parent().siblings().eq(6).children("span").text());	
 		$("#edit-prd-condition").val($(this).parent().parent().siblings().eq(7).children("span").text());	
 		$("#edit-prd-ID").val($(this).parent().parent().siblings().eq(8).children("span").text());	
@@ -304,6 +307,7 @@ $(document).ready(function(){
 		var str = $(this).val();
 		ajax_search(str,"http://Business_arena/index.php/DBController/filter/client-loc-search")
 	});
+	
 	function ajax_search(str,url_string){
 		$.ajax({
 			type:'POST',
@@ -328,22 +332,45 @@ $(document).ready(function(){
 		var str = $(this).val();
 		ajax_search(str,"http://Business_arena/index.php/DBController/filter/client-prd-cat-filter");
 	});	
+	$(".main-content-area").on("change","#client-prd-area-filter", function(){
+		var str = $(this).val();
+		ajax_search(str,"http://Business_arena/index.php/DBController/filter/client-prd-area-filter");
+	});	
 	$(".main-content-area").on("change","#client-views-selector", function(){
 		var str = $(this).val();
-		$.ajax({
-			type:'POST',
-			data: {search_string: str},
-			url:'http://Business_arena/index.php/DBController/load_product_views',
-			beforeSend: function(){
-				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
-			},
-			complete: function(){
-				$(".loader-thin").fadeOut("slow");
-			},
-			success: function(result){
-				$(".chart").html(result);
-			}
-		});
+		if (str != "all categories"){
+			$.ajax({
+				type:'POST',
+				data: {search_string: str},
+				url:'http://Business_arena/index.php/DBController/load_product_views',
+				beforeSend: function(){
+					$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
+				},
+				complete: function(){
+					$(".loader-thin").fadeOut("slow");
+				},
+				success: function(result){
+					$(".chart").html(result);
+				}
+			});	
+		}
+		else{
+			$.ajax({
+				type:'POST',
+				data: {search_string: str},
+				url:'http://Business_arena/index.php/DBController/show_views_panel/get_ID/page_update',
+				beforeSend: function(){
+					$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
+				},
+				complete: function(){
+					$(".loader-thin").fadeOut("slow");
+				},
+				success: function(result){
+					$(".chart").html(result);
+				}
+			});
+		}
+		
 	});
 	$(".main-content-area").on("click",".edit-btn.loc", function(){
 		//alert($(this).parent().parent().siblings().eq(4).children("span").text());
@@ -447,9 +474,30 @@ $(document).ready(function(){
 	});*/
 	
 	/*businesses page*/
-	$(".main-content-area").on("click","#add-new-business",function(){
+	$("#client-add-new-business-btn").click(function(){
 		$(".modal-frame-small").html($("#add-business").html());
 		$(".modal-BG").css("display","flex");
+	});
+	$("#client-del-business-btn").click(function(){
+		$(".modal-frame-small").html($("#del-business").html());
+		$(".modal-BG").css("display","flex");
+	});
+	$(".main-content-area").on("keyup","#client-biz-search", function(){
+		var str = $(this).val();
+		$.ajax({
+			type:'POST',
+			data: {search_string: str},
+			url: "http://Business_arena/index.php/DBController/filter/client-biz-search",
+			beforeSend: function(){
+				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
+			},
+			complete: function(){
+				$(".loader-thin").fadeOut("slow");
+			},
+			success: function(result){
+				$("section.businesses").html(result);
+			}
+		});
 	});
 	
 	

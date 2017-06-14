@@ -6,12 +6,12 @@
             </p>	
         </header>
         <header id="search" >
-            <input id = "prdUserSearch" name = "search" type = "text" placeholder = "&#128269; Search...">		
+            <input id = "client-biz-search" name = "search" type = "text" placeholder = "&#128269; Search...">		
         </header>
         </header>
         <section class = "margin-top-min">
-        	<button id = "add-new-business" class = "BA-button">&#10010; Add Business</button>
-    		<button id = "delete-business" class = "BA-button">&#9866; Delete Business</button>
+        	<button id = "client-add-new-business-btn" class = "BA-button">&#10010; Add Business</button>
+    		<button id = "client-del-business-btn" class = "BA-button">&#9866; Delete Business</button>
         </section>
         <section class = "businesses">
         	<?php if (isset($no_businesses)): ?>
@@ -65,6 +65,28 @@
                 <input type = "text" name = "biz-main-email" placeholder = "enter business email" class = "BA-input margin-bottom-std"><br>
                 <span class = "BA-dark-orange">Buisness main mobile (Alternative mobile numbers can be added later)</span>
                 <input type = "text" name = "biz-main-mobile" placeholder = "enter mobile number e.g 265 995 926 084" class = "BA-input">
+                <div class = "center-bottom-btn">
+                    <input id = "client-add-business" type = "submit" value = "Submit" class = "BA-button-large">
+                </div><br>
+            </div>
+            <?php echo form_close(); ?>
+    </div>
+     <div id = "del-business" style = "display: none;">
+        <span class = "modal-closebtn">&#10060;</span> 
+            <p class = "title-strip h-font-size margin-bottom-std">DELETE BUSINESS</p>
+            <?php echo form_open("DBController/del_business"); ?>
+            <div class = "_80p-width-center-rwd vertical-align">
+                <span class = "BA-dark-orange">Select business name:</span>
+                <select class = "BA-select margin-bottom-std" name = "biz-ID">
+                	<option selected disabled>Select business</option>
+                    <?php if (isset($no_businesses)): ?>                        
+                    <?php else: ?>
+                        <?php foreach ($businesses->result() as $row): ?>
+                        	<option value = "<?=$row->biz_ID?>"><?=$row->biz_name?></option>
+                        <?php endforeach; ?>            		
+                    <?php endif; ?>	
+                </select>
+                <br>                
                 <div class = "center-bottom-btn">
                     <input id = "client-add-business" type = "submit" value = "Submit" class = "BA-button-large">
                 </div><br>

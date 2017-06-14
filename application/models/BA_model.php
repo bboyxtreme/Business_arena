@@ -14,20 +14,65 @@ class BA_model extends CI_Model {
 	public function add_client($client_details){
 		$this->insert_BA_data("users",$client_details);
 	}
-	public function add_business($biz_details,$user_ID){
+	public function add_business($biz_details,$user_ID,$us_ID){
 		$user_owns_biz= array(
 			"user_ID" => $user_ID,
 			"biz_ID" => $biz_details["biz_ID"]
 		);
 		$this->insert_BA_data("businesses",$biz_details);
 		$this->insert_BA_data("users_own_business",$user_owns_biz);
+		$biz_quota = array(
+			"us_ID" => $us_ID,
+			"us_state" => "invalid",
+			"us_days_left" => 0,
+			"us_last_update_date" => date("Y-m-d"),
+			"biz_ID" => $biz_details["biz_ID"]
+		);
+		$this->insert_BA_data("business_usage_quotas",$biz_quota);
 	}
-	public function load_business_info($user_ID, $biz_ID = "all"){
+	public function del_business($biz_ID){
+		$where = array(
+					"biz_ID" => $biz_ID
+				);
+		/*$this->del("businesses_has_business_fields",$where);
+		$where2 = array(
+					"confirm_status" => "not_confirmed"
+				);
+		$this->del("business_fields",$where2);
+		*/
+		$locations = $this->load_locations($biz_ID);
+		foreach($locations->result() as $row){
+			$this->delete_loc($biz_ID,$row->loc_ID);
+			//echo $row->loc_ID . " ";
+		}
+			//echo "<br><br>";
+		$this->del("business_usage_quotas",$where);
+		
+		$this->del("users_view_business",$where);
+		
+		$products = $this->load_products($biz_ID);	
+		foreach($products->result() as $row){
+			$this->delete_prd($biz_ID,$row->prd_ID);
+		}	
+		
+		$this->del("users_own_business",$where);
+		$this->del("businesses",$where);			
+	}
+	public function load_business_info($user_ID, $biz_ID = "all",$search_phrase = ""){
 		if ($biz_ID == "all"){
 			$this->db->select("businesses.biz_ID,biz_name,biz_slogan,biz_main_field,biz_picture_name");
 			$this->db->from("businesses");
 			$this->db->join("users_own_business","users_own_business.biz_ID = businesses.biz_ID");
 			$this->db->where("users_own_business.user_ID",$user_ID);
+			$result = $this->db->get();
+			return $result;
+		}
+		else if ($biz_ID == "search"){
+			$this->db->select("businesses.biz_ID,biz_name,biz_slogan,biz_main_field,biz_picture_name");
+			$this->db->from("businesses");
+			$this->db->join("users_own_business","users_own_business.biz_ID = businesses.biz_ID");
+			$this->db->where("users_own_business.user_ID",$user_ID)
+					->like("biz_name",$search_phrase);
 			$result = $this->db->get();
 			return $result;
 		}
@@ -79,9 +124,8 @@ class BA_model extends CI_Model {
 		$this->update_BA_data("businesses",$biz_update_details,$where);
 	}
 	public function load_products($biz_ID, $prd_select_type = "all", $search_phrase = ""){
-		$select = array("business_products.prd_ID","prd_name","prd_price","prd_quantity","cat_name","prd_type",
-						"prd_condition","prd_description","pic_name");
-						
+		$select = array("business_products.prd_ID","loc_ID","prd_name","prd_price","prd_quantity","cat_name","prd_type",
+						"prd_condition","prd_description","pic_name");						
 		if ($prd_select_type == "all"){
 			$this->db->select($select)->from("business_products")
 				->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
@@ -125,6 +169,17 @@ class BA_model extends CI_Model {
 			$result = $this->db->get();
 			return $result;	
 		}
+		else if ($prd_select_type == "prd-area-filter"){
+			$this->db->select($select)->from("business_products")
+				->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
+				->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
+				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
+				->where("biz_ID", $biz_ID)
+				->like("loc_ID",$search_phrase)
+				->where("cat_usage","main");
+			$result = $this->db->get();
+			return $result;	
+		}
 		else{
 			$this->db->select($select)->from("business_products")
 				->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
@@ -155,6 +210,14 @@ class BA_model extends CI_Model {
 			$result = $this->db->get();
 			return $result;		
 		}
+		else if ($search_phrase == "prd-locations"){
+			$this->db->select("loc_area,business_locations.loc_ID")->distinct()
+				->from("business_locations")
+				->join("business_products","business_locations.loc_ID = business_products.loc_ID")
+				->where("biz_ID", $biz_ID);
+			$result = $this->db->get();
+			return $result;
+		}
 		else{
 			$this->db->select($select)->from("business_locations")
 				->join("businesses_has_business_locations","business_locations.loc_ID = businesses_has_business_locations.loc_ID")
@@ -183,6 +246,38 @@ class BA_model extends CI_Model {
 			$result = $this->db->get();	
 		}		
 		return $result;
+	}
+	public function load_subscriptions(){
+		$this->db->select()->from("subscriptions")->where("subscr_type","usage_quota");
+		$result["usage quota"] = $this->db->get();
+		$this->db->select()->from("subscriptions")->where("subscr_type","market_boost");
+		$result["market boost"] = $this->db->get();
+		return $result;
+	}
+	public function get_usage_quota($biz_ID){
+		$this->db->select()->from("business_usage_quotas")->where("biz_ID",$biz_ID);
+		$result = $this->db->get();
+		return $result;
+	}
+	public function get_last_update_date(){
+		$this->db->select("us_last_update_date")->distinct()->from("business_usage_quotas");
+		$result = $this->db->get();
+		return $result;
+	}
+	public function update_uq($num_of_days){
+		$query = "update business_usage_quotas 
+				  set us_days_left = us_days_left-" . $num_of_days . ", us_last_update_date = '" . date("Y-m-d") . "'
+				  where us_state = 'valid';";
+		$this->db->query($query);
+		//$where = array("us_state", "valid");
+		/*$this->db->set("us_days_left","us_days_left-1");
+		$this->db->set("us_last_update_date", date("Y-m-d"));
+		$this->db->update("business_usage_quotas");*/
+		/*$where = array("us_state", "valid");
+		$this->db->set("us_days_left","us_days_left-" . $num_of_days);
+		$this->db->set("us_last_update_date",date("Y-m-d"));
+		$this->db->where($where);
+		$this->db->update("business_usage_quotas");*/		
 	}
 	public function check_CAT($cat){
 		$prd_categories = $this->load_prd_categories();
@@ -316,6 +411,9 @@ class BA_model extends CI_Model {
 	}
 	public function delete_prd($biz_ID,$prd_ID){
 		$where = array("prd_ID" => $prd_ID);
+				
+		//del views
+		$this->del("users_view_products",$where);
 		
 		//del prd picture. first delete record then delete assoicated picture stored on server
 		$pic_name = $this->load_products($biz_ID,$prd_ID)->row()->pic_name;
@@ -327,6 +425,9 @@ class BA_model extends CI_Model {
 		
 		//del prd category
 		$this->del("product_product_category",$where);
+		
+		//del views
+		$this->del("users_view_products",$where);
 		
 		//del prd
 		$this->del("business_products",$where);		
