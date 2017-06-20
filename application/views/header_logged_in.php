@@ -37,7 +37,7 @@
 	</header>
 	<header class = "htop margin-top-std padding-std">
 		<section id = "page-nav" class = "margin-bottom-min"><a href = "#" id = "nav-home" class = "BA-orange BA-anchor">Home</a></section>
-        <div>
+        <div class = "site-controls">
         	<button id = "back-button" class = "BA-button-orange margin-right-std">&#8592;</button>
             <input type = "text" id = "main-search" class = "search-icon" placeholder="&#128269; Search catalogue...">
             <button id = "main-search-btn" class = "BA-button-yellow">&#128269;</button>

@@ -390,42 +390,6 @@ $(document).ready(function(){
 	$(".main-content-area").on("change","#client-prd-area-filter", function(){
 		var str = $(this).val();
 		ajax_search(str,"http://Business_arena/index.php/DBController/filter/client-prd-area-filter");
-	});	
-	$(".main-content-area").on("change","#client-views-selector", function(){
-		var str = $(this).val();
-		if (str != "all categories"){
-			$.ajax({
-				type:'POST',
-				data: {search_string: str},
-				url:'http://Business_arena/index.php/DBController/load_product_views',
-				beforeSend: function(){
-					$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
-				},
-				complete: function(){
-					$(".loader-thin").fadeOut("slow");
-				},
-				success: function(result){
-					$(".chart").html(result);
-				}
-			});	
-		}
-		else{
-			$.ajax({
-				type:'POST',
-				data: {search_string: str},
-				url:'http://Business_arena/index.php/DBController/show_views_panel/get_ID/page_update',
-				beforeSend: function(){
-					$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
-				},
-				complete: function(){
-					$(".loader-thin").fadeOut("slow");
-				},
-				success: function(result){
-					$(".chart").html(result);
-				}
-			});
-		}
-		
 	});
 	$(".main-content-area").on("click",".edit-btn.loc", function(){
 		//alert($(this).parent().parent().siblings().eq(4).children("span").text());
@@ -484,6 +448,47 @@ $(document).ready(function(){
 		});
 	});*/
 	
+	//views page	
+	$(".main-content-area").on("change","#client-views-selector", function(){
+		var str = $(this).val();
+		if (str != "all categories"){			
+			$.ajax({
+				type:'POST',
+				data: {search_string: str},
+				url:'http://Business_arena/index.php/DBController/load_product_views',
+				beforeSend: function(){
+					$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
+				},
+				complete: function(){
+					$(".loader-thin").fadeOut("slow");
+				},
+				success: function(result){
+					$(".chart").html(result);
+					$("#views-title").text("PRODUCT VIEWS");
+					$("#views-category-title").text("PRODUCT NAME (" + str + ")");
+				}
+			});	
+		}
+		else{
+			$.ajax({
+				type:'POST',
+				data: {search_string: str},
+				url:'http://Business_arena/index.php/DBController/show_views_panel/get_ID/page_update',
+				beforeSend: function(){
+					$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
+				},
+				complete: function(){
+					$(".loader-thin").fadeOut("slow");
+				},
+				success: function(result){
+					$(".chart").html(result);
+					$("#views-title").text("PRODUCT CATEGORY VIEWS");
+				}
+			});
+		}
+		
+	});
+		
 	//Usage quota page
 	$(".main-content-area").on("click",".buy-uq-btn",function(){
 		$(".modal-BG").css("display","flex");

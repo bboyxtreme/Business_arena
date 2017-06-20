@@ -57,19 +57,20 @@
         </select>
         <button id = "add-new-products" class = "BA-button">&#10010; Add products</button>
     </section>
-    <div class = "list-header">
-    	<div class = "list-column"><span class = "BA-dark-orange">Thumbnail</span></div>	
-        <div class = "list-column"><span class = "BA-dark-orange">Product Name</span></div>
-        <div class = "list-column low-p"><span class = "BA-dark-orange">Category</span></div>
-        <div class = "list-column"><span class = "BA-dark-orange">Unit Price</span></div>
-        <div class = "list-column low-p"><span class = "BA-dark-orange">Quantity</span></div>
-        <div class = "list-column low-p"><span class = "BA-dark-orange">Controls</span></div>
-        <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
-    </div>
-    <section class = "client-item-list-cont">	    
+   	    
     <?php if(isset($no_products)): ?>
     	<p class = "BA-dark-green"><?=$no_products?></p>
     <?php else: ?>
+         <div class = "list-header">
+            <div class = "list-column"><span class = "BA-dark-orange">Thumbnail</span></div>	
+            <div class = "list-column"><span class = "BA-dark-orange">Product Name</span></div>
+            <div class = "list-column low-p"><span class = "BA-dark-orange">Category</span></div>
+            <div class = "list-column"><span class = "BA-dark-orange">Unit Price</span></div>
+            <div class = "list-column low-p"><span class = "BA-dark-orange">Quantity</span></div>
+            <div class = "list-column low-p"><span class = "BA-dark-orange">Controls</span></div>
+            <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
+        </div>
+        <section class = "client-item-list-cont">
 		<?php foreach($products->result() as $row):?>
         <div id = "<?=$row->prd_ID?>" class = "list-row">
             <div class = "list-column"><img class = 'prd-thumbnails' alt = '<?=$row->pic_name?>' src="<?php echo base_url(); ?>images/uploads/<?=$row->pic_name?>"></div>	
@@ -92,8 +93,9 @@
             <div class = "list-column show-hidden  view-more-btn prd"><span class = "BA-dark-orange">View more...</span></div>
         </div>
         <?php endforeach;?>
+         </section>
     <?php endif; ?>
-    </section>
+   
 </section>
 
 <section class = "modal-BG">

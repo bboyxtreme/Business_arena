@@ -15,17 +15,17 @@
         <p class = "side-by-side-item info-item-emboss margin-top-std BA-green">Total views: <span class = "BA-dark-orange"><?php echo $views['total_views']; ?></span></p>
     </section>
     <div class = "center-content">
-    	<p class = "info-item-emboss margin-top-std BA-dark-orange inline">PRODUCT CATEGORY VIEWS</p>
+    	<p id = "views-title" class = "info-item-emboss margin-top-std BA-dark-orange inline">PRODUCT CATEGORY VIEWS</p>
     </div>
     <section class = "chart-area margin-top-std">
     <div class = "chart BA-dark-orange-bg">
-        <div class = "border-white-right padding-std" style = "display: inline-block;">
-            <p class = "BA-white">Category Name</p>
+        <div id = "view-cat-column" class = "border-white-right padding-std">
+            <p id = "views-category-title" class = "BA-white">Category Name</p>
             <?php foreach($business_categories->result() as $row): ?>
             <p class = "BA-green"><?=$row->cat_name?></p>
             <?php endforeach; ?>
         </div>    
-        <div class = "border-white-right padding-std" style = "display: inline-block;">
+        <div class = "border-white-right padding-std">
             <p class = "BA-white">VIEWS</p>
             <?php foreach($cat_views as $row): ?>
             <p class = "BA-yellow center"><?=$row?></p>

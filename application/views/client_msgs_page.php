@@ -10,7 +10,10 @@
         </header>
     </header>
     <section>
-    <div class = "list-header">
+    <?php if ($messages->num_rows() == 0): ?>
+    	<p class = "BA-green">You don't have any notifications yet.</p>
+    <?php else : ?>
+     <div class = "list-header">
         <div class = "list-column  low-p"><span class = "BA-dark-orange">Date</span></div>	
         <div class = "list-column"><span class = "BA-dark-orange">From</span></div>
         <div class = "list-column"><span class = "BA-dark-orange">Subject</span></div>
@@ -26,5 +29,6 @@
         <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
     </div>
     <?php endforeach; ?>
+    <?php endif; ?>
     </section>
 </section>

@@ -363,7 +363,8 @@ class DBController extends CI_Controller {
 		$this->load->view('footer');
 	}
 	public function show_views_panel($biz_ID, $mod = "full page"){
-		if($biz_ID == "get_ID"){ $biz_ID = $this->session->userdata("biz_ID");}
+		if($biz_ID == "get_ID"){ 
+		$biz_ID = $this->session->userdata("biz_ID");}
 		$data['views'] = $this->BA_model->load_business_views($biz_ID);
 		$business_categories = $this->BA_model->load_prd_categories($biz_ID);			
 		$product_views = $this->BA_model->load_prdouct_views($biz_ID);
@@ -393,18 +394,18 @@ class DBController extends CI_Controller {
 			$this->load->view('footer');
 		}
 		else{
-			echo '<div class = "border-white-right padding-std" style = "display: inline-block;">';
-			echo '    <p class = "BA-white">Category Name</p>';
+			echo '<div id = "view-cat-column" class = "border-white-right padding-std">';
+			echo '<p id = "views-category-title" class = "BA-white">Category Name</p>';
 			foreach($business_categories->result() as $row){
 				echo '<p class = "BA-green">' . $row->cat_name . '</p>';
 			}
-			echo '</div><div class = "border-white-right padding-std" style = "display: inline-block;">';
+			echo '</div><div class = "border-white-right padding-std">';
 			echo '    <p class = "BA-white">VIEWS</p>';
 			foreach($cat_views as $row){
 				echo '<p class = "BA-yellow center">' . $row . '</p>';
 			}
 			echo '</div>';	
-			}
+		} 
 	}
 	public function show_uq_panel($biz_ID){
 		$data["biz_name"] = $this->session->userdata("biz_name");
@@ -827,12 +828,12 @@ class DBController extends CI_Controller {
 				array_push($cat_views,0);
 			}					
 		}
-		echo '<div class = "border-white-right padding-std" style = "display: inline-block;">';
-        echo '    <p class = "BA-white">Category Name</p>';
+		echo '<div id = "view-cat-column" class = "border-white-right padding-std">';
+        echo '    <p id = "views-category-title" class = "BA-white">Category Name</p>';
         foreach($products->result() as $row){
             echo '<p class = "BA-green">' . $row->prd_name . '</p>';
         }
-        echo '</div><div class = "border-white-right padding-std" style = "display: inline-block;">';
+        echo '</div><div class = "border-white-right padding-std" >';
         echo '    <p class = "BA-white">VIEWS</p>';
         foreach($cat_views as $row){
             echo '<p class = "BA-yellow center">' . $row . '</p>';

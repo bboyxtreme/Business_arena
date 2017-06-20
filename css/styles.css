@@ -186,13 +186,17 @@ a{
 	flex-wrap: wrap;
 }
 .htop input{
-	width: 200px;
+	width: 180px;
 	height: 35px;
 	padding: 5px 10px;
 	box-sizing: border-box;
 	border-radius: 5px;
 	border: 1px solid #cfcfcf;
 	margin-right: 10px;
+}
+.site-controls{
+	display: flex;
+	justify-content: flex-end;	
 }
 .catalogue-cont-mobile{
 	position: fixed;
@@ -500,9 +504,15 @@ table.prd-thumbnail p{
 }
 .filters{
 	padding: 5px 0;
+	display: flex;
+	justify-content: space-between;
+	flex-wrap:wrap;
 	/*display: none;*/
 }
-
+.filters *{
+	width: 100%;
+	margin: 0 0 5px 0;
+} 	
 /* Search page */
 .results-frame{
 	position: relative;
@@ -820,7 +830,17 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 .chart{
 	padding: 10px;	
 	border: 2px outset rgb(200,100,1);
-	
+	display: flex;
+	justify-content: flex-start;
+}
+.chart p{
+	max-width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+#view-cat-column{
+	max-width: 70%;
 }
 
 
@@ -1138,8 +1158,23 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 }
 
 
+
 /*Wide screen styles*/
+
+@media screen and (min-width: 350px){
+	.filters *{
+		width: 45%;
+	} 	
+}
+
 @media screen and (min-width: 700px){
+	.filters{
+		justify-content:flex-start;	
+	}
+	.filters *{
+		width: auto;
+		margin: 0 10px 5px 0;
+	} 
 	.hmain{
 		background-color: rgb(255,255,255);
 		min-height: 200px;
