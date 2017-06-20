@@ -123,8 +123,29 @@ class BA_model extends CI_Model {
 		);
 		$this->update_BA_data("businesses",$biz_update_details,$where);
 	}
+	public function load_biz_fields($biz_ID){
+		$this->db->select()->from("business_fields")
+			->join("businesses_has_business_fields","business_fields.field_ID = businesses_has_business_fields.field_ID")
+			->where("biz_ID",$biz_ID);
+		$result = $this->db->get();
+		return $result;
+	}
+	public function add_field($biz_ID,$field_ID,$field_name){
+		$field_details = array(
+			"field_ID" => $field_ID,
+			"field_name" => $field_name,
+			"confirm_status" => "not_confirmed"
+		);
+		$this->insert_BA_data("business_fields",$field_details);
+		
+		$field_join = array(
+			"field_ID" => $field_ID,
+			"biz_ID" => $biz_ID
+		);
+		$this->insert_BA_data("businesses_has_business_fields",$field_join);
+	}
 	public function load_products($biz_ID, $prd_select_type = "all", $search_phrase = ""){
-		$select = array("business_products.prd_ID","loc_ID","prd_name","prd_price","prd_quantity","cat_name","prd_type",
+		$select = array("business_products.prd_ID","loc_ID","prd_name","prd_price","prd_quantity","product_categories.cat_ID","cat_name","prd_type",
 						"prd_condition","prd_description","pic_name");						
 		if ($prd_select_type == "all"){
 			$this->db->select($select)->from("business_products")
@@ -252,6 +273,12 @@ class BA_model extends CI_Model {
 		$result["usage quota"] = $this->db->get();
 		$this->db->select()->from("subscriptions")->where("subscr_type","market_boost");
 		$result["market boost"] = $this->db->get();
+		return $result;
+	}
+	public function load_mesgs_comms($biz_ID){
+		$this->db->select()->from("messages_and_comments")
+			->where("biz_ID",$biz_ID);
+		$result = $this->db->get();
 		return $result;
 	}
 	public function get_usage_quota($biz_ID){

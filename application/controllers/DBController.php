@@ -54,6 +54,7 @@ class DBController extends CI_Controller {
 		$this->session->set_userdata("biz_ID",$biz_ID);
 		$data['views'] = $this->BA_model->load_business_views($biz_ID);
 		$data['biz_info'] = $this->BA_model->load_business_info($user_ID,$biz_ID)->row();
+		$data['biz_fields'] = $this->BA_model->load_biz_fields($biz_ID);
 		$this->session->set_userdata("biz_name",$data['biz_info']->biz_name);	
 		$this->load->view('header_logged_in');
 		$this->load->view('business_control_panel',$data);
@@ -298,6 +299,12 @@ class DBController extends CI_Controller {
 		$this->load->view('success_page',$data);
 		$this->load->view('footer');
 	}
+	public function add_field(){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$field_ID = $this->generate_ID("field");
+		$field_name = $this->input->post("field_name");	
+		$this->BA_model->add_field($biz_ID,$field_ID,$field_name);
+	}
 	public function del_business(){
 		$biz_ID = $this->input->post("biz-ID");
 		$this->BA_model->del_business($biz_ID);
@@ -407,6 +414,13 @@ class DBController extends CI_Controller {
 		$this->load->view('client_uq_page',$data);
 		$this->load->view('footer');
 	}
+	public function show_msgcom_panel($biz_ID){
+		$data["biz_name"] = $this->session->userdata("biz_name");
+		$data["messages"] = $this->BA_model->load_mesgs_comms($biz_ID);	
+		$this->load->view('header_logged_in');
+		$this->load->view('client_msgs_page',$data);
+		$this->load->view('footer');
+	}
 	public function generate_ID($mod){
 		switch ($mod){
 			case "product" :
@@ -431,6 +445,11 @@ class DBController extends CI_Controller {
 				$lastID = (int)(substr($this->BA_model->get_last_ID("business_usage_quotas","us_ID"),3));				
 				$us_ID = "BUQ" . sprintf("%05d",++$lastID);
 				return $us_ID;
+				break;	
+			case "field" :
+				$lastID = (int)(substr($this->BA_model->get_last_ID("business_fields","field_ID"),2));				
+				$field_ID = "BF" . sprintf("%05d",++$lastID);
+				return $field_ID;
 				break;			
 		}
 	}
@@ -624,6 +643,51 @@ class DBController extends CI_Controller {
 		$notification = "You have successfully deleted your location";
 		$this->show_success_page("Location Delete Successfull",$notification);
 	}
+	public function pay_for_subcription($mod){
+		$biz_ID = $this->session->userdata("biz_ID");
+		$user_ID = $this->session->userdata("user_ID");
+		$subscr_ID = $this->input->post("subscr-ID");
+		if ($mod == "scan"){
+			$config['upload_path'] = './uploads/scans/';
+			$config['allowed_types'] = 'jpg|gif|png';
+			$config['max_size']	= '5000';
+			$this->load->library('upload', $config);
+			if ( ! $this->upload->do_upload())
+			{
+				$error = $this->upload->display_errors();
+				echo $error;
+			}
+			else
+			{
+				$upload_data = $this->upload->data();
+				$payment_scan = $upload_data['file_name'];	
+				$payment_details = array(
+					"biz_ID" => $biz_ID,
+					"user_ID" => $user_ID,
+					"subscr_ID" => $subscr_ID,
+					"purchase_date" => date("Y-m-d"),
+					"purchase_type" => $mod,
+					"scan_img_or_transc_code" => $payment_scan
+				);
+				$this->BA_model->insert_BA_data("users_purchase_subscription",$payment_details);
+				$notification = "You have successfully uploaded your purchase details. Please await confirmation and approval. Many thanks for supporting the Business Arena";					
+			}				
+		}
+		else if ($mod == "mobile_money"){
+			$transac_code = $this->input->post("transc");	
+			$payment_details = array(
+				"biz_ID" => $biz_ID,
+				"user_ID" => $user_ID,
+				"subscr_ID" => $subscr_ID,
+				"purchase_date" => date("Y-m-d"),
+				"purchase_type" => $mod,
+				"scan_img_or_transc_code" => $transac_code
+			);					
+			$this->BA_model->insert_BA_data("users_purchase_subscription",$payment_details);
+			$notification = "You have successfully submited your payment details. Please await confirmation and approval. Many thanks for supporting the Business Arena";
+		}
+		$this->show_success_page("Payment details successfully uploaded",$notification);
+	}
 	public function filter($type){
 		$biz_ID = $this->session->userdata("biz_ID");
 		$user_ID = $this->session->userdata("user_ID");
@@ -705,24 +769,25 @@ class DBController extends CI_Controller {
 	}
 	public function load_filtered_products($products){
 		foreach($products->result() as $row){
-			echo '<div class = "list-row">';
+			echo '<div id = "' . $row->prd_ID . '"class = "list-row">';
 			echo '<div class = "list-column"><img class = "prd-thumbnails" alt = "' . $row->pic_name . '" src="' . base_url() . 'images/uploads/' . $row->pic_name . '"></div>';
 			echo '<div class = "list-column"><span class = "BA-green">' . $row->prd_name . '</span></div>';
-			echo '<div class = "list-column low-p"><span class = "BA-green">' . $row->cat_name . '</span></div>';
-			echo '<div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont">' . number_format((float)$row->prd_price,2) . '</span></span></div>';
+			echo '<div class = "list-column low-p"><span id = "' . $row->cat_ID . '" class = "BA-green">' . $row->cat_name . '</span></div>';
+			echo '<div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont">' . number_format((float)$row->prd_price) . '</span></span><span class = "hidden">' . $row->prd_price . '</span></div>';
 			echo '<div class = "list-column low-p"><span class = "BA-green">' . $row->prd_quantity . '</span></div>';
 			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_type . '</span></div>';
 			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_description . '</span></div>';  
 			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_condition . '</span></div>'; 
 			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_ID . '</span></div>';
-			echo '<div class = "hidden"><span class = "BA-green">' . $row->pic_name . '</span></div>';        
+			echo '<div class = "hidden"><span class = "BA-green">' . $row->pic_name . '</span></div>'; 
+			echo '<div class = "hidden"><span class = "BA-green">' . $row->loc_ID . '</span></div>'; 		       
 			echo '<div class = "list-column low-p">';
 			echo '<div class = "ctrl-icons-cont">';
 			echo '<img id = "' . $row->prd_ID . '" src="' . base_url()  . 'images/edit.jpg" class="ctrl-icons edit-btn prd">';
 			echo '<img id = "' . base_url("DBController/del_prd/" . $row->prd_ID) . '" src="' . base_url() . 'images/delete.jpg" class="ctrl-icons del-btn prd">';
 			echo '</div>';
 			echo '</div>';
-			echo '<div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>';
+			echo '<div class = "list-column show-hidden view-more-btn"><span class = "BA-dark-orange">View more...</span></div>';
 			echo '</div>';
 		}	
 	}

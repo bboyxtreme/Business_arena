@@ -20,7 +20,7 @@
     </section>
     <div class = "list-header">	
         <div class = "list-column"><span class = "BA-dark-orange">Location Name</span></div>
-        <div class = "list-column low-p"><span class = "BA-dark-orange">District</span></div>
+        <div class = "list-column"><span class = "BA-dark-orange">District</span></div>
         <div class = "list-column"><span class = "BA-dark-orange">Directions</span></div>
         <div class = "list-column low-p"><span class = "BA-dark-orange">Country</span></div>
         <div class = "list-column low-p"><span class = "BA-dark-orange">Controls</span></div>
@@ -31,7 +31,7 @@
     	<p class = "BA-dark-green"><?=$no_locations?></p>
     <?php else: ?>
 		<?php foreach($locations->result() as $row): ?>   
-        <div class = "list-row">	
+        <div id = "<?=$row->loc_ID?>" class = "list-row">	
             <div class = "list-column"><span class = "BA-green"><?=$row->loc_area?></span></div>
             <div class = "list-column"><span class = "BA-green"><?=$row->loc_district?></span></div>
             <div class = "list-column"><span class = "BA-green"><?=$row->loc_description?></span></div>
@@ -43,7 +43,7 @@
                     <img id = '<?= base_url("DBController/del_loc/" . $row->loc_ID) ?>' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-btn loc'>
                 </div>
             </div>
-            <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
+            <div class = "list-column show-hidden  view-more-btn loc"><span class = "BA-dark-orange">View more...</span></div>
         </div>
         <?php endforeach; ?>
     <?php endif; ?>
@@ -70,8 +70,8 @@
         <span class = "BA-dark-orange">Location Description:</span>
         <input type = "text" name = "loc-description" placeholder = "enter location description" class = "BA-input margin-bottom-std"><br>
         </div>
-        <?php echo form_close(); ?>
         <div class = "center-bottom-btn"><input type = "submit" value = "Submit" class = "BA-button-large"></div>
+        <?php echo form_close(); ?>        
 </div>
 
 <div id = "edit-loc" style = "display: none;">
@@ -106,4 +106,21 @@
         <a id = "del-loc-btn" href="#"><button class = "BA-button-large">DELETE</button></a>
         <button class = "BA-button-orange-large margin-left-std">CANCEL</button>
         
+</div>
+
+<div id = "view-more-content" class = "hidden">
+    <span class = "modal-closebtn">&#10060;</span>
+    <p class = "title-strip h-font-size margin-bottom-std">LOCATION INFO</p>
+    <div id = "modal-frame-body" class = "side-by-side-cont">
+        <div id = "client-view-loc-area" class = "BA-dark-orange info-item-emboss"><span class = "BA-green"></span></div>
+        <div id = "client-view-loc-district" class = "BA-green info-item-emboss"><span class = "BA-green"></span></div> 
+        <div id = "client-view-loc-country" class = "BA-dark-orange info-item-emboss"><span class = "BA-green"></span></div>
+        <div id = "client-view-loc-directions" class = "BA-green info-item-emboss"><span class = "BA-green"></span></div>  
+        <div class = "info-item-emboss">
+            <div class = "ctrl-icons-cont">
+                <img id = '' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-view-loc'>
+                <img id = '' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-view-loc'>
+            </div>
+        </div>     
+    </div>
 </div>

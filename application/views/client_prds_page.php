@@ -71,11 +71,11 @@
     	<p class = "BA-dark-green"><?=$no_products?></p>
     <?php else: ?>
 		<?php foreach($products->result() as $row):?>
-        <div class = "list-row">
+        <div id = "<?=$row->prd_ID?>" class = "list-row">
             <div class = "list-column"><img class = 'prd-thumbnails' alt = '<?=$row->pic_name?>' src="<?php echo base_url(); ?>images/uploads/<?=$row->pic_name?>"></div>	
             <div class = "list-column"><span class = "BA-green"><?=$row->prd_name?></span></div>
-            <div class = "list-column low-p"><span class = "BA-green"><?=$row->cat_name?></span></div>
-            <div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont"><?=number_format((float)$row->prd_price,2)?></span></span><span class = "hidden"><?=$row->prd_price?></span></div>
+            <div class = "list-column low-p"><span id = "<?=$row->cat_ID?>" class = "BA-green"><?=$row->cat_name?></span></div>
+            <div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont"><?=number_format((float)$row->prd_price)?></span></span><span class = "hidden"><?=$row->prd_price?></span></div>
             <div class = "list-column low-p"><span class = "BA-green"><?=$row->prd_quantity?></span></div>
             <div class = "hidden"><span class = "BA-green"><?=$row->prd_type?></span></div>
             <div class = "hidden"><span class = "BA-green"><?=$row->prd_description?></span></div>  
@@ -85,11 +85,11 @@
             <div class = "hidden"><span class = "BA-green"><?=$row->loc_ID?></span></div>       
             <div class = "list-column low-p">
                 <div class = "ctrl-icons-cont">
-                    <img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn prd'>
+               		<img id = '<?=$row->prd_ID?>' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-btn prd'>
                     <img id = '<?=base_url("DBController/del_prd/" . $row->prd_ID)?>' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-btn prd'>
                 </div>
             </div>
-            <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
+            <div class = "list-column show-hidden  view-more-btn prd"><span class = "BA-dark-orange">View more...</span></div>
         </div>
         <?php endforeach;?>
     <?php endif; ?>
@@ -176,7 +176,7 @@
             <input id = "edit-prd-type" type = "text" name = "prd-type" placeholder = "enter prd-type e.g. phone, trouser or camera" class = "_100pwidth BA-input margin-bottom-std"><br>
             <input id = "edit-prd-ID" type = "hidden" name = "prd-ID">
             <input id = "edit-pic-name" type = "hidden" name = "prd-pic">
-            <select id = "edit-prd-area" class = "_100pwidth BA-select margin-bottom-std" name = "prd-category">
+            <select id = "edit-prd-area" class = "_100pwidth BA-select margin-bottom-std" name = "prd-area">
                 <option selected disabled>Select Area</option>
                 <?php foreach($all_locations->result() as $row): ?>
                     <option value = "<?=$row->loc_ID?>"><?=$row->loc_area?></option>
@@ -225,5 +225,36 @@
     <div class = "right-align-content">
         <a id = "del-prd-delete-btn" href = "#"><button class = "BA-button-large margin-top-extra margin-right-std">DELETE</button></a>
         <button id = "del-prd-cancel-btn" class = "BA-button-orange-large margin-top-extra">CANCEL</button>
-    <div>        
+    </div>        
+</div>
+
+<div id = "view-more-content" class = "hidden">
+    <span class = "modal-closebtn">&#10060;</span>
+    <p class = "title-strip h-font-size margin-bottom-std">PRODUCT INFO</p>
+    <div id = "modal-frame-body" class = "side-by-side-cont">
+    	<div class = "client-view-more-image-cont"><img alt = '' src="<?php echo base_url(); ?>images/no_biz_image.jpg"></div>  
+        <div id = "client-view-prd-name" class = "BA-dark-orange info-item-emboss"><span class = "BA-green"></span></div>
+        <div id = "client-view-prd-cat" class = "BA-green info-item-emboss"><span class = "BA-green"></span></div> 
+        <div class = "BA-dark-orange info-item-emboss">
+        	<span class = "BA-green">
+            	<span>MWK </span>
+                <span id = "client-view-prd-price"></span>
+            </span>
+            <span class = "hidden">
+            </span>
+        </div>
+        <div id = "client-view-prd-quantity" class = "BA-green info-item-emboss"><span class = "BA-green"></span></div>
+        <div id = "client-view-prd-type" class = "hidden"><span class = "BA-green"></span></div>
+        <div id = "client-view-prd-description" class = "hidden"><span class = "BA-green"></span></div>  
+        <div id = "client-view-prd-condition" class = "hidden"><span class = "BA-green"></span></div> 
+        <div id = "client-view-prd-ID" class = "hidden"><span class = "BA-green"></span></div>  
+        <div id = "client-view-prd-pic" class = "hidden"><span class = "BA-green"></span></div> 
+        <div id = "client-view-prd-loc" class = "hidden"><span class = "BA-green"></span></div>  
+        <div class = "info-item-emboss">
+            <div class = "ctrl-icons-cont">
+                <img id = '' src='<?php echo base_url(); ?>images/edit.jpg' class='ctrl-icons edit-view'>
+                <img id = '' src='<?php echo base_url(); ?>images/delete.jpg' class='ctrl-icons del-view'>
+            </div>
+        </div>     
+    </div>
 </div>

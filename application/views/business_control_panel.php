@@ -13,8 +13,22 @@
         <p class = "BA-green biz-info-item">Total views<br><span class = "BA-dark-orange"><?php echo $views['total_views']; ?></span></p>
         <p class = "BA-green biz-info-item">Business details<br>
         <span class = "BA-green label">Name: </span><span id = "client-biz-name-label" class = "BA-dark-orange"><?php echo $biz_info->biz_name; ?></span><br>
-        <span class = "BA-green label">Slogain: </span><span id = "client-biz-slogan-label" class = "BA-dark-orange"><?php echo $biz_info->biz_slogan; ?></span><br>
-        <span class = "BA-green label">Field: </span><span id = "client-biz-field-label" class = "BA-dark-orange"><?php echo $biz_info->biz_main_field; ?></span> <button id = "add-field-btn" class = "BA-button">&#10010; Add Field</button><br>
+        <span class = "BA-green label">Slogan: </span><span id = "client-biz-slogan-label" class = "BA-dark-orange"><?php echo $biz_info->biz_slogan; ?></span><br>
+        
+       <!-- <span>-->
+        <span class = "BA-green label">Field(s): </span>
+        <span id = "client-biz-field-label" class = "BA-dark-orange"><?php echo $biz_info->biz_main_field; ?></span><br>
+        <!--<span id = "client-biz-field-label" class = "BA-dark-orange">
+			<?php 
+				/*echo $biz_info->biz_main_field;
+				foreach($biz_fields->result() as $row){
+					echo "," . $row->field_name;
+				}*/
+			?>
+        </span> 
+        <button id = "add-field-btn" class = "BA-button">&#10010; Add Field</button>-->
+        <!--</span>-->
+        
         <span class = "BA-green label">Mobile: </span><span id = "client-biz-mobile-label" class = "BA-dark-orange"><?php echo $biz_info->biz_main_mobile; ?></span><br>
         <span class = "BA-green label">Email: </span><span  id = "client-biz-email-label"class = "BA-dark-orange"><?php echo $biz_info->biz_main_email; ?></span><br>
         <button id = "edit-biz-details-btn" class = "BA-button">Edit</button>
@@ -44,7 +58,7 @@
         </div>
         <a href="<?php echo base_url("DBController/show_views_panel/" . $biz_info->biz_ID);?>"><button class = "biz-func-button BA-white">VIEWS</button></a>
         <a href="<?php echo base_url("DBController/show_uq_panel/" . $biz_info->biz_ID);?>"><button class = "biz-func-button BA-dark-orange">USAGE QUOTA</button></a>
-        <button id = "ctrl-panel-msgs" class = "biz-func-button BA-white">MESSAGES</button>
+        <a href="<?php echo base_url("DBController/show_msgcom_panel/" . $biz_info->biz_ID);?>"><button class = "biz-func-button BA-white">NOTIFICATIONS</button></a>
         </section>
     </section>
 </section>

@@ -2,7 +2,7 @@
     <header class = "info">
         <header id="heading">
             <p class = "BA-green no-margin">
-                <?php echo "Zest Shop >> Messages"; ?> 
+                <?php echo $biz_name . " >> Notifcations"; ?> 
             </p>	
         </header>
         <header id="search" >
@@ -17,19 +17,14 @@
         <div class = "list-column low-p"><span class = "BA-dark-orange">Body</span></div>
         <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
     </div>
+    <?php foreach($messages->result() as $row): ?>
     <div class = "list-row">
-        <div class = "list-column low-p"><span class = "BA-green">MsgDate</span></div>
-        <div class = "list-column"><span class = "BA-green">MsgSender</span></div>
-        <div class = "list-column"><span class = "BA-green">MsgSubject</div>
-        <div class = "list-column low-p"><span class = "BA-green">MsgBody</span></div>
+        <div class = "list-column low-p"><span class = "BA-green"><?=$row->msgcom_date?></span></div>
+        <div class = "list-column"><span class = "BA-green"><?=$row->msgcom_sender?></span></div>
+        <div class = "list-column"><span class = "BA-green"><?=$row->msgcom_subject?></div>
+        <div class = "list-column low-p msg-cont"><span class = "BA-green"><?=$row->msgcom_content?></span></div>
         <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
     </div>
-    <div class = "list-row">
-        <div class = "list-column low-p"><span class = "BA-green">MsgDate</span></div>
-        <div class = "list-column"><span class = "BA-green">MsgSender</span></div>
-        <div class = "list-column"><span class = "BA-green">MsgSubject</div>
-        <div class = "list-column low-p"><span class = "BA-green">MsgBody</span></div>
-        <div class = "list-column show-hidden"><span class = "BA-dark-orange">View more...</span></div>
-    </div>
+    <?php endforeach; ?>
     </section>
 </section>

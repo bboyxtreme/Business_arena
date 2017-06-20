@@ -655,6 +655,16 @@ tr.result:hover{
 	border: 1px outset rgb(255,255,255);
 	padding: 5px;
 }
+.biz-info-item span span{
+	display: inline-block;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	transition: overflow 3s ease;
+}
+.biz-info-item span span:hover{
+	overflow: visible;
+}
 .main-func-container{
 	display: flex;
 	justify-content: space-between;
@@ -723,6 +733,8 @@ tr.result:hover{
 }
 .list-column span{
 	margin: auto;
+	font-size: 10px;
+	text-align: center;
 }
 .low-p{
 	display: none;	
@@ -777,6 +789,14 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 	height: 30%;
 	width: 100%;	
 }
+.client-view-more-image-cont{
+	width: 100%;
+	max-height: 400px;
+}
+.client-view-more-image-cont img{
+	max-width: 100%;
+	height: auto;
+}
 
 /*Usage quota page*/
 .card-display-cont{
@@ -800,6 +820,7 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 .chart{
 	padding: 10px;	
 	border: 2px outset rgb(200,100,1);
+	
 }
 
 
@@ -1089,7 +1110,16 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 	display: flex;
 	align-items: flex-end;	
 }
-
+.msg-cont{
+	overflow: hidden;	
+}
+.msg-cont span{	
+	text-overflow: ellipsis;
+	white-space: nowrap;	
+}
+.view-more-btn{
+	cursor: pointer;	
+}
 
 /*Specific styles container*/
 #make-payment-cont{
@@ -1246,6 +1276,30 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 	}
 	table.information-mobile{
 		display: none;
+	}
+	/*.list-row, .list-header{
+		min-height: 50px;
+		display: flex; 
+	}
+	.list-row{
+		background-color: rgb(255,255,255);	
+		border: 1px outset rgb(255,255,255);
+		margin-bottom: 5px;
+	}
+	.list-column{
+		flex: 1;
+		min-height: 48px;
+		display: flex;
+	}
+	.list-row .list-column{	
+		border-right: 1px solid green;
+	}
+	
+	.low-p{
+		display: none;	
+	}*/
+	.list-column span{
+		font-size: 15px;
 	}
 	.low-p{
 		display: flex;	
