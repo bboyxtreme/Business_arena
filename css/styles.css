@@ -234,10 +234,11 @@ a{
 .LC{
 	display: block;
 	margin: 10px auto;
-	font-size: 20px;
-	/*background-color: rgba(155,155,155,0.7);*/
+	font-size: 18px;
+	border: none;
+	color: rgb(250,250,250);
+	background-color: rgba(155,155,155,0);
 	padding: 5px;
-	border-radius: 5px;
 }
 .main-content-area, .main-content-area-cat-closed{
 	position: relative;
@@ -719,6 +720,7 @@ tr.result:hover{
 
 /*products page*/
 .client-item-list-cont{
+	position: relative;
 	min-height: 600px;
 	max-height: 725px;	
 	overflow-y: scroll;
@@ -1146,6 +1148,9 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 	position: relative; 
 	min-height: 200px;	
 }
+.shadow{
+	text-shadow: 1px 1px black;
+}
 
 /*#client-function-select{
 	margin: 5px 0;	
@@ -1277,6 +1282,9 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 	.product, .biz-main-ctrl-panel, .info-body{
 		display: flex;
 		align-items: flex-start;
+	}
+	.product{
+		justify-content: space-between;	
 	}
 	.info-body{
 		justify-content: space-between;
@@ -1430,7 +1438,12 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 	.biz-ctrl-panel-image-edit{
 		max-width: 50%;	
 	}
+	.LC{
+		font-size: 20px;
+		color: rgb(204,210,0);
+		text-shadow: none;	
 	}
+}
 /*
 .money-BG{
 	background-image: url("Background2.jpg");

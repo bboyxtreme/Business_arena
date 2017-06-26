@@ -17,8 +17,8 @@
 		<section id = "text">
 			<ul>
 				<li><a href="<?php echo base_url(); ?>" class = "general">Home</a></li>
-				<li><a id = "about-us" class = "general">About us</a></li>
-				<li><a id = "contact-us" class = "general">Contact us</a></li>
+				<li><a href="<?php echo base_url("about_us"); ?>" class = "general">About us</a></li>
+				<li><a href="<?php echo base_url("contact_us"); ?>" class = "general">Contact us</a></li>
 				<li id = 'login'>Log in</li>
 				<!--<li id = "login">Log in</li>-->
                 <!--<li id = "logout">Log out</li>-->
@@ -35,8 +35,19 @@
         <div id="loading"><img src="<?php echo base_url(); ?>images/load.gif"></div>	
 	</header>
 	<header class = "htop margin-top-std padding-std">
-		<section id = "page-nav" class = "margin-bottom-min"><a href = "#" id = "nav-home" class = "BA-orange BA-anchor">Home</a></section>
-        <div>
+		<section id = "page-nav" class = "margin-bottom-min">
+        	<a href = "<?php echo base_url(); ?>" class = "BA-orange BA-anchor">Home</a><!--id = nav-home-->
+            <?php if (isset($page)): ?>
+            <?php if ($page == "About"): ?>
+				<span class = "BA-orange">>> About us</span>
+			<?php elseif ($page == "Contacts"): ?>
+				<span class = "BA-orange">>> Contact us</span>
+            <?php elseif ($page == "user-business"): ?>
+				<span class = "BA-orange">>> <?=$biz_info->biz_name?></span>		
+			<?php endif;?>
+            <?php endif;?>
+        </section>
+        <div class = "site-controls">
         	<button id = "back-button" class = "BA-button-orange margin-right-std">&#8592;</button>
             <input type = "text" id = "main-search" class = "search-icon" placeholder="&#128269; Search catalogue...">
             <button id = "main-search-btn" class = "BA-button-yellow">&#128269;</button>
@@ -49,41 +60,29 @@
         	<option>Product Catalog</option>
         </select>
 		<div id='cssmenu'>
-        	<ul>				 
-                <li class='has-sub'><a href='#'><span>locDistrict1</span></a>
-                    <ul>
-                        <li class='has-sub second'><a href='#'><span>locArea1</span></a>
-                            <ul>
-                                <li>
-                                    <a href='#'><span class = "cat-biz-name">bizName1</span></a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+        	<ul>
+            <?php foreach($catalogue["districts"]->result() as $district): ?>
+            	<li class='has-sub'><a href='#'><span><?=$district->loc_district?></span></a>
+                	<ul>
+                	<?php foreach($catalogue["areas"]->result() as $area): ?>
+                    	<?php if ($district->loc_district == $area->loc_district): ?>
+                        	<li class='has-sub second'><a href='#'><span><?=$area->loc_area?></span></a>
+                            	<ul>
+                            	<?php foreach($catalogue["businesses"]->result() as $business): ?>
+                                	<?php if ($area->loc_area == $business->loc_area): ?>
+                                    	<li>
+                                            <a href='<?php echo base_url("DBController/show_business/" . $business->biz_ID . "/" . $business->loc_ID); ?>'><span><?=$business->biz_name?></span></a>
+                                        </li>                                    
+                                    <?php endif;?>
+                                <?php endforeach; ?>
+                           		</ul>
+                            </li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                	</ul>
                 </li>
-                <li class='has-sub'><a href='#'><span>locDistrict2</span></a>
-                    <ul>
-                        <li class='has-sub second'><a href='#'><span>locArea2</span></a>
-                            <ul>
-                                <li>
-                                    <a href='#'><span class = "cat-biz-name">bizName2</span></a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>	
-                <li class='has-sub'><a href='#'><span>locDistrict3</span></a>
-                    <ul>
-                        <li class='has-sub second'><a href='#'><span>locArea3</span></a>
-                            <ul>
-                                <li>
-                                    <a href='#'><span class = "cat-biz-name">bizName3</span></a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+            <?php endforeach; ?>
+        	</ul>
         </div>
 	</aside>    
 	<section class = "main-content-area">

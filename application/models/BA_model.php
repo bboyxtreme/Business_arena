@@ -5,6 +5,42 @@ class BA_model extends CI_Model {
 	{
 		$this->load->database();
 	}	
+	public function load_catalogue($user_type = ""){
+		if ($user_type == "BO"){
+			$user_ID = $this->session->userdata("user_ID");	
+			$query1 = $this->db->select("loc_district")->distinct()
+					->from("business_locations")
+					->join("businesses_has_business_locations", "business_locations.loc_ID = businesses_has_business_locations.loc_ID")->join("users_own_business","businesses_has_business_locations.biz_ID = users_own_business.biz_ID")
+					->where("user_ID",$user_ID)->get();
+					
+			$query2 = $this->db->select("loc_area,loc_district")->distinct()
+					->from("business_locations")
+					->join("businesses_has_business_locations", "business_locations.loc_ID = businesses_has_business_locations.loc_ID")->join("users_own_business","businesses_has_business_locations.biz_ID = users_own_business.biz_ID")
+					->where("user_ID",$user_ID)->get();
+			$query3 = $this->db->select("businesses.biz_ID,biz_name,loc_area,business_locations.loc_ID")
+					->from("businesses")
+					->join("businesses_has_business_locations","businesses.biz_ID = businesses_has_business_locations.biz_ID")
+					->join("business_locations","businesses_has_business_locations.loc_ID = business_locations.loc_ID")
+					->join("users_own_business","businesses.biz_ID = users_own_business.biz_ID")
+					->where("user_ID",$user_ID)
+					->get();		
+		}
+		else{
+			$query1 = $this->db->select("loc_district")->distinct()
+					->from("business_locations")->get();
+			$query2 = $this->db->select("loc_area,loc_district")->distinct()
+						->from("business_locations")->get();
+			$query3 = $this->db->select("businesses.biz_ID,biz_name,loc_area,business_locations.loc_ID")
+					->from("businesses")
+					->join("businesses_has_business_locations","businesses.biz_ID = businesses_has_business_locations.biz_ID")
+					->join("business_locations","businesses_has_business_locations.loc_ID = business_locations.loc_ID")
+					->get();	
+		}		
+		$result['districts'] = $query1;
+		$result['areas'] = $query2;
+		$result['businesses'] = $query3;		
+		return $result;
+	}
 	public function authenticate($email,$password){
 		$this->db->select('user_ID,first_name,last_name,user_type');
 		$this->db->where("email = '" . $email . "' and password = md5('" . $password . "')");
@@ -29,6 +65,25 @@ class BA_model extends CI_Model {
 			"biz_ID" => $biz_details["biz_ID"]
 		);
 		$this->insert_BA_data("business_usage_quotas",$biz_quota);
+	}
+	public function add_view($item_ID,$user_ID,$view_type,$loc_ID =""){
+		if ($view_type == "business"){
+			$view = array(
+				"view_date" => date("Y-m-d"),
+				"user_ID" => $user_ID,
+				"biz_ID" => $item_ID,
+				"loc_ID" => $loc_ID
+			);
+			$this->insert_BA_data("users_view_business",$view);
+		}
+		else if ($view_type == "product"){
+			$view = array(
+				"view_date" => date("Y-m-d"),
+				"user_ID" => $user_ID,
+				"prd_ID" => $item_ID
+			);
+			$this->insert_BA_data("users_view_products",$view);
+		}
 	}
 	public function del_business($biz_ID){
 		$where = array(
@@ -117,6 +172,39 @@ class BA_model extends CI_Model {
 		}
 		return $result;
 	}
+	public function load_trending_biz(){
+		$this->db->select("businesses.biz_ID,biz_name, count(*) as num_views")->from("users_view_business")
+			->join("businesses","users_view_business.biz_ID = businesses.biz_ID")
+			->group_by("biz_name")
+			->order_by("num_views","DESC");
+		$result = $this->db->get();
+		return $result;
+	}
+	public function load_new_biz(){
+		$this->db->select("biz_ID,biz_name, biz_slogan, biz_reg_date")->from("businesses")
+				->order_by("biz_reg_date","DESC");
+		$result = $this->db->get();
+		$new_biz = array();
+		$count = 0;
+		$d = strtotime("-1 Month");	 
+		foreach ($result->result() as $row){
+			if($row->biz_reg_date > date("Y-m-d", $d)){
+				$new_biz[$count]['biz_name'] = $row->biz_name;
+				$new_biz[$count]['biz_slogan'] = $row->biz_slogan;
+				$new_biz[$count]['biz_ID'] = $row->biz_ID;
+				$count++;
+			}
+		}
+		return $new_biz;
+	}
+	public function load_trending_prds(){
+		$this->db->select("business_products.prd_ID,prd_name,biz_ID,loc_ID,count(*) as num_views")->from("users_view_products")
+			->join("business_products","users_view_products.prd_ID = business_products.prd_ID")
+			->group_by("users_view_products.prd_ID")
+			->order_by("num_views","DESC");
+		$result = $this->db->get();
+		return $result;
+	}
 	public function update_biz_info($biz_ID,$biz_update_details){
 		$where = array(
 			"biz_ID" => $biz_ID
@@ -144,7 +232,7 @@ class BA_model extends CI_Model {
 		);
 		$this->insert_BA_data("businesses_has_business_fields",$field_join);
 	}
-	public function load_products($biz_ID, $prd_select_type = "all", $search_phrase = ""){
+	public function load_products($biz_ID, $prd_select_type = "all", $search_phrase = "", $mod = ""){
 		$select = array("business_products.prd_ID","loc_ID","prd_name","prd_price","prd_quantity","product_categories.cat_ID","cat_name","prd_type",
 						"prd_condition","prd_description","pic_name");						
 		if ($prd_select_type == "all"){
@@ -164,6 +252,7 @@ class BA_model extends CI_Model {
 				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
 				->where("biz_ID", $biz_ID)
 				->like("prd_name",$search_phrase)
+				->like("loc_ID",$mod)
 				->where("cat_usage","main");
 			$result = $this->db->get();
 			return $result;	
@@ -175,6 +264,7 @@ class BA_model extends CI_Model {
 				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
 				->where("biz_ID", $biz_ID)
 				->like("prd_type",$search_phrase)
+				->like("loc_ID",$mod)
 				->where("cat_usage","main");
 			$result = $this->db->get();
 			return $result;	
@@ -186,11 +276,13 @@ class BA_model extends CI_Model {
 				->join("prd_pictures","business_products.prd_ID = prd_pictures.prd_ID")
 				->where("biz_ID", $biz_ID)
 				->like("cat_name",$search_phrase)
+				->like("loc_ID", $mod)
 				->where("cat_usage","main");
 			$result = $this->db->get();
 			return $result;	
 		}
 		else if ($prd_select_type == "prd-area-filter"){
+			$search_phrase = $search_phrase == "not_specified" ? "" : $search_phrase;
 			$this->db->select($select)->from("business_products")
 				->join("product_product_category","business_products.prd_ID = product_product_category.prd_ID")
 				->join("product_categories","product_product_category.cat_ID = product_categories.cat_ID")
@@ -253,6 +345,10 @@ class BA_model extends CI_Model {
 			$result = $this->db->get();
 			return $result;
 		}			
+	}
+	public function get_location($loc_ID){
+		$result = $this->db->select()->from("business_locations")->where("loc_ID", $loc_ID)->get();
+		return $result;
 	}
 	public function load_prd_categories($biz_ID = "all"){
 		if($biz_ID == "all"){
@@ -489,15 +585,7 @@ class BA_model extends CI_Model {
 		}		
 		return $result;		
 	}
-/*	public function retrieve($tableName,$columns,$where){
-		$this->db->select($columns);
-		$query = $this->db->get_where($tableName,$where);
-		return $query;
-	}
-	public function insertTable($table,$data){
-		$this->db->insert($table,$data);
-	}
-	public function generateCatalogue($userType){
+/*	public function generateCatalogue($userType){
 		if ($userType == "client"){
 			$query1 = $this->db->query('SELECT distinct locDistrict 
 								FROM users, users_have_biz_description,biz_description, biz_description_biz_location, biz_location
@@ -555,12 +643,6 @@ class BA_model extends CI_Model {
 		$output = $this->db->query($query);
 		return $output;		
 	}
-	public function update($tableName,$updateData,$where){		
-		$this->db->where($where);
-		$this->db->update($tableName,$updateData);		
-	}
-	public function del($tableName,$where){
-		$this->db->delete($tableName,$where);
-	}*/
+*/
 }
 ?>

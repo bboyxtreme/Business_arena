@@ -11,11 +11,20 @@ class DBController extends CI_Controller {
 	}
 	public function index($user_type = "Customer"){	
 		if ($user_type == "Customer"){
-			$this->load->view('header');		
-			$this->load->view('home_page_user');
+			$data['catalogue'] = $this->BA_model->load_catalogue();
+			$data['trending_biz'] = $this->BA_model->load_trending_biz();
+			$data['new_biz'] = $this->BA_model->load_new_biz();
+			$data['trending_prds'] = $this->BA_model->load_trending_prds();
+			/*foreach($data['trending_prds']->result() as $row){
+				echo $row->prd_name . " " . $row->num_views . "<br>";
+			}
+			die();*/
+			$this->load->view('header',$data);		
+			$this->load->view('home_page_user',$data);
 			$this->load->view('footer');
 		}	
 		else if ($user_type == "Business_Owner"){
+			$data['catalogue'] = $this->BA_model->load_catalogue("BO");
 			$user_ID = $this->session->userdata("user_ID");
 			$businesses = $this->BA_model->load_business_info($user_ID);
 			if ($businesses->num_rows() == 0){
@@ -24,39 +33,81 @@ class DBController extends CI_Controller {
 			else{
 				$data['businesses'] = $businesses;
 			}
-			$this->load->view('header_logged_in');		
+			$this->load->view('header_logged_in',$data);		
 			$this->load->view('home_page_bo',$data);
 			$this->load->view('footer');
 		}
 		else if ($user_type == "Admin"){
-			$this->load->view('header_logged_in');		
+			$data['catalogue'] = $this->BA_model->load_catalogue();
+			$this->load->view('header_logged_in',$data);		
 			$this->load->view('home_page_admin');
 			$this->load->view('footer');
 		}		
 	}
 	public function about_page(){
-		$this->load->view('header');
+		$data['catalogue'] = $this->BA_model->load_catalogue();
+		$data['page'] = "About";
+		$this->load->view('header',$data);
 		$this->load("about_us");
 		$this->load->view('footer');
 	}
 	public function contacts_page(){
-		$this->load->view('header');
+		$data['catalogue'] = $this->BA_model->load_catalogue();
+		$data['page'] = "Contacts";
+		$this->load->view('header',$data);
 		$this->load("contact_us");
 		$this->load->view('footer');
 	}
-	public function show_business($business_name){		
-			$this->load->view('header');
+	public function show_business($business_name, $loc_ID = "not_specified"){
+		if($loc_ID == "not_specified"){			
+			$user_type = $this->session->userdata("user_type");
+			if($user_type == "Business_Owner"){
+				$biz_ID = $business_name;
+				$this->show_business_ctrl_panel($biz_ID);
+			}
+			else{
+				$biz_ID = $business_name;		
+				$this->session->set_userdata("biz_ID",$biz_ID);
+				$this->session->set_userdata("loc_ID",$loc_ID);
+				$this->BA_model->add_view($biz_ID,"anon","business",$loc_ID);
+				$data['biz_info'] = $this->BA_model->load_business_info("anon",$business_name)->row();	
+				$data['locations'] = $loc_ID == "not_specified" ? "no_location" : $this->BA_model->get_location($loc_ID)->row();
+				$data["filter_locations"] = $this->BA_model->load_locations($biz_ID,"prd-locations");
+				$data['products'] = $this->BA_model->load_products($biz_ID,"prd-area-filter",$loc_ID);
+				$data["page"] = "user-business";
+				$data['catalogue'] = $this->BA_model->load_catalogue();	
+				$this->load->view('header',$data);
+				$this->load->view('user_business_page');
+				$this->load->view('footer');
+			}		
+		}
+		else {
+			$biz_ID = $business_name;		
+			$this->session->set_userdata("biz_ID",$biz_ID);
+			$this->session->set_userdata("loc_ID",$loc_ID);
+			$this->BA_model->add_view($biz_ID,"anon","business",$loc_ID);
+			$data['biz_info'] = $this->BA_model->load_business_info("anon",$business_name)->row();	
+			$data['location'] = $loc_ID == "not_specified" ? "no_location" : $this->BA_model->get_location($loc_ID)->row();
+			$data["filter_locations"] = $this->BA_model->load_locations($biz_ID,"prd-locations");
+			$data['products'] = $this->BA_model->load_products($biz_ID,"prd-area-filter",$loc_ID);
+			$data["page"] = "user-business";
+			$data['catalogue'] = $this->BA_model->load_catalogue();	
+			$this->load->view('header',$data);
 			$this->load->view('user_business_page');
 			$this->load->view('footer');
+		}
+		
 	}
 	public function show_business_ctrl_panel($biz_ID){
 		$user_ID = $this->session->userdata("user_ID");
 		$this->session->set_userdata("biz_ID",$biz_ID);
+		$data['page'] = "business home";
 		$data['views'] = $this->BA_model->load_business_views($biz_ID);
 		$data['biz_info'] = $this->BA_model->load_business_info($user_ID,$biz_ID)->row();
 		$data['biz_fields'] = $this->BA_model->load_biz_fields($biz_ID);
 		$this->session->set_userdata("biz_name",$data['biz_info']->biz_name);	
-		$this->load->view('header_logged_in');
+		$data['catalogue'] = $this->BA_model->load_catalogue("BO");	
+		$this->load->view('header_logged_in',$data);
 		$this->load->view('business_control_panel',$data);
 		$this->load->view('footer');		
 	}
@@ -90,10 +141,14 @@ class DBController extends CI_Controller {
 		$this->session->set_userdata("notification",$notification);
 		$this->show_business_ctrl_panel($biz_ID);
 	}
-	public function show_product($business_name,$product_name){
+	public function show_product($business_name,$product_name,$loc_ID = ""){
 		//cho $business_name . "<br>" . $product_name;
-		$this->load->view('header');
-		$this->load("product");
+		$data['catalogue'] = $this->BA_model->load_catalogue();	
+		$data['biz_details'] = $this->BA_model->load_business_info("",$business_name)->row();
+		$data['prd_info'] = $this->BA_model->load_products($business_name,$product_name)->row();
+		$data['location'] = $this->BA_model->get_location($loc_ID)->row();
+		$this->load->view('header',$data);
+		$this->load("product",$data);
 		$this->load->view('footer');
 	}
 	public function proms_page($prom_type){
@@ -219,6 +274,7 @@ class DBController extends CI_Controller {
 				else{
 					$data['businesses'] = $businesses;
 				}
+				$data['catalogue'] = $this->BA_model->load_catalogue("BO");
 				$this->load->view('header_logged_in', $data);
 				$this->load->view('home_page_bo', $data);
 				$this->load->view('footer');				
@@ -308,9 +364,10 @@ class DBController extends CI_Controller {
 	public function del_business(){
 		$biz_ID = $this->input->post("biz-ID");
 		$this->BA_model->del_business($biz_ID);
+		$data['catalogue'] = $this->BA_model->load_catalogue("BO");
 		$data["success_heading"] = "Business deletion successful";	
 		$data["success_msg"] = "You have successfully deleted your buisness";	
-		$this->load->view('header_logged_in');
+		$this->load->view('header_logged_in',$data);
 		$this->load->view('success_page',$data);
 		$this->load->view('footer');
 	}
@@ -335,36 +392,45 @@ class DBController extends CI_Controller {
 	}
 	public function show_prd_panel($biz_ID){
 		$products = $this->BA_model->load_products($biz_ID);
+		$data['page'] = "Products";
+		$data['biz_ID'] = $this->session->userdata("biz_ID");
 		if($products->num_rows() == 0){
 			$data["no_products"] = "This business doesn't have any products at the moment. Add some by clicking on the add products button now!!";
 		}
 		else{
 			$data["products"] = $products;
 		}	
-		$data["locations"] = $this->BA_model->load_locations($biz_ID,"prd-locations");
-		$data["all_locations"] = $this->BA_model->load_locations($biz_ID);	
+		$data["locations"] = $this->BA_model->load_locations($biz_ID,"prd-locations");//queries database for locations that have products for filter function
+		$data["all_locations"] = $this->BA_model->load_locations($biz_ID);// queries all locaions regardless for add product form
 		$data["prd_categories"] = $this->BA_model->load_prd_categories();		
-		$data["biz_name"] = $this->session->userdata("biz_name");		
-		$this->load->view('header_logged_in');
+		$data["biz_name"] = $this->session->userdata("biz_name");
+		$data['catalogue'] = $this->BA_model->load_catalogue("BO");		
+		$this->load->view('header_logged_in',$data);
 		$this->load->view('client_prds_page',$data);
 		$this->load->view('footer');
 	}
 	public function show_loc_panel($biz_ID){
 		$locations = $this->BA_model->load_locations($biz_ID);
+		$data['page'] = "Locations";
+		$data['biz_ID'] = $this->session->userdata("biz_ID");
 		if($locations->num_rows() == 0){
 			$data["no_locations"] = "Your business doesn't have any locations. Add a location now and give your business exposure via catalogue and location search mechanisms";
 		}
 		else{
 			$data["locations"] = $locations;
 		}				
-		$data["biz_name"] = $this->session->userdata("biz_name");		
-		$this->load->view('header_logged_in');
+		$data["biz_name"] = $this->session->userdata("biz_name");	
+		$data['catalogue'] = $this->BA_model->load_catalogue("BO");	
+		$this->load->view('header_logged_in',$data);
 		$this->load->view('client_locs_page',$data);
 		$this->load->view('footer');
 	}
 	public function show_views_panel($biz_ID, $mod = "full page"){
-		if($biz_ID == "get_ID"){ 
-		$biz_ID = $this->session->userdata("biz_ID");}
+		if($biz_ID == "get_ID"){
+			$biz_ID = $this->session->userdata("biz_ID");
+		}
+		$data['page'] = "Views";
+		$data['biz_ID'] = $biz_ID;
 		$data['views'] = $this->BA_model->load_business_views($biz_ID);
 		$business_categories = $this->BA_model->load_prd_categories($biz_ID);			
 		$product_views = $this->BA_model->load_prdouct_views($biz_ID);
@@ -375,21 +441,18 @@ class DBController extends CI_Controller {
 				if($cat->cat_name == $views->cat_name){
 					array_push($cat_views,$views->num_views);
 					$found = 1;
-					//echo "found";
 				}
 			}
 			if($found != 1){
 				array_push($cat_views,0);
-				//echo "not found";
-			}				
-			//echo "<br>";		
+			}					
 		}
-		//print_r($cat_views);
 		if ($mod == "full page"){
 			$data["cat_views"] = $cat_views;	
 			$data["business_categories"] = $business_categories;			
-			$data["biz_name"] = $this->session->userdata("biz_name");		
-			$this->load->view('header_logged_in');
+			$data["biz_name"] = $this->session->userdata("biz_name");
+			$data['catalogue'] = $this->BA_model->load_catalogue("BO");		
+			$this->load->view('header_logged_in',$data);
 			$this->load->view('client_views_page',$data);
 			$this->load->view('footer');
 		}
@@ -409,16 +472,22 @@ class DBController extends CI_Controller {
 	}
 	public function show_uq_panel($biz_ID){
 		$data["biz_name"] = $this->session->userdata("biz_name");
+		$data['page'] = "Usage Quota";
+		$data['biz_ID'] = $this->session->userdata("biz_ID");
 		$data["subscriptions"] = $this->BA_model->load_subscriptions();	
 		$data["usage_quota"] = $this->BA_model->get_usage_quota($biz_ID)->row()->us_days_left;
-		$this->load->view('header_logged_in');
+		$data['catalogue'] = $this->BA_model->load_catalogue("BO");
+		$this->load->view('header_logged_in',$data);
 		$this->load->view('client_uq_page',$data);
 		$this->load->view('footer');
 	}
 	public function show_msgcom_panel($biz_ID){
+		$data['page'] = "Messages";
+		$data['biz_ID'] = $this->session->userdata("biz_ID");
 		$data["biz_name"] = $this->session->userdata("biz_name");
 		$data["messages"] = $this->BA_model->load_mesgs_comms($biz_ID);	
-		$this->load->view('header_logged_in');
+		$data['catalogue'] = $this->BA_model->load_catalogue("BO");
+		$this->load->view('header_logged_in',$data);
 		$this->load->view('client_msgs_page',$data);
 		$this->load->view('footer');
 	}
@@ -536,8 +605,9 @@ class DBController extends CI_Controller {
 			}
 		}		
 		$data["success_heading"] = "Product addition successful";	
-		$data["success_msg"] = $notification;	
-		$this->load->view('header_logged_in');
+		$data["success_msg"] = $notification;
+		$data['catalogue'] = $this->BA_model->load_catalogue("BO");	
+		$this->load->view('header_logged_in',$data);
 		$this->load->view('success_page',$data);
 		$this->load->view('footer');	
 	}
@@ -557,11 +627,11 @@ class DBController extends CI_Controller {
 		);	
 		$this->BA_model->add_location($biz_ID,$loc_details);
 		$notification = "You have successfully added a location";
-		$data["success_heading"] = "Location addition successful";	
-		$data["success_msg"] = $notification;	
-		$this->load->view('header_logged_in');
-		$this->load->view('success_page',$data);
-		$this->load->view('footer');
+		$this->show_success_page("Location addition successful!",$notification);
+	}
+	public function add_prd_view($prd_ID){
+		$user_ID = $this->session->userdata("user_ID") == null ? "anon" : $this->session->userdata("user_ID");
+		$this->BA_model->add_view($prd_ID,$user_ID,"product");
 	}
 	public function edit_product(){
 		$config['upload_path'] = './images/uploads/';
@@ -610,7 +680,8 @@ class DBController extends CI_Controller {
 	public function show_success_page($heading, $body){
 		$data["success_heading"] = $heading;	
 		$data["success_msg"] = $body;	
-		$this->load->view('header_logged_in');
+		$data['catalogue'] = $this->BA_model->load_catalogue("BO");
+		$this->load->view('header_logged_in',$data);
 		$this->load->view('success_page',$data);
 		$this->load->view('footer');
 	}
@@ -690,6 +761,8 @@ class DBController extends CI_Controller {
 		$this->show_success_page("Payment details successfully uploaded",$notification);
 	}
 	public function filter($type){
+		$loc_ID = $this->session->userdata("loc_ID");
+		$loc_ID = $loc_ID == "not_specified" ? "" : $loc_ID;
 		$biz_ID = $this->session->userdata("biz_ID");
 		$user_ID = $this->session->userdata("user_ID");
 		$srch_phrase = $this->input->post("search_string");
@@ -745,9 +818,47 @@ class DBController extends CI_Controller {
 				}
 				break;
 			case "client-biz-search" :
-					$businesses = $this->BA_model->load_business_info($user_ID,"search",$srch_phrase);
-					$this->load_filtered_businesses($businesses);
+				$businesses = $this->BA_model->load_business_info($user_ID,"search",$srch_phrase);
+				$this->load_filtered_businesses($businesses);
 				break;
+			case "user-prd-area-filter" :
+				$products = $this->BA_model->load_products($biz_ID,"prd-area-filter",$srch_phrase);
+				if($products->num_rows() == 0){
+					echo "No products found";
+				}
+				else{
+					$this->load_filtered_products($products,"user");
+				}				
+				break;
+			case "user-prd-type-filter" :				
+				$products = $this->BA_model->load_products($biz_ID,"prd-type-filter",$srch_phrase,$loc_ID);
+				if($products->num_rows() == 0){
+					echo "No products found";
+				}
+				else{
+					$this->load_filtered_products($products,"user");
+				}				
+				break;	
+			case "user-prd-cat-filter" :
+				$products = $this->BA_model->load_products($biz_ID,"prd-cat-filter",$srch_phrase,$loc_ID);
+				$data["biz_name"] = $this->session->userdata("biz_name");
+				if($products->num_rows() == 0){
+					echo "No products found";
+				}
+				else{
+					$this->load_filtered_products($products, "user");
+				}				
+				break;
+			case "user-prd-search" :
+				$products = $this->BA_model->load_products($biz_ID,"search",$srch_phrase,$loc_ID);
+				$data["biz_name"] = $this->session->userdata("biz_name");
+				if($products->num_rows() == 0){
+					echo "No products found";
+				}
+				else{
+					$this->load_filtered_products($products,"user");
+				}				
+				break;						
 		}
 	}
 	public function load_filtered_businesses($businesses){
@@ -768,29 +879,45 @@ class DBController extends CI_Controller {
 			}           		
         }		
 	}
-	public function load_filtered_products($products){
-		foreach($products->result() as $row){
-			echo '<div id = "' . $row->prd_ID . '"class = "list-row">';
-			echo '<div class = "list-column"><img class = "prd-thumbnails" alt = "' . $row->pic_name . '" src="' . base_url() . 'images/uploads/' . $row->pic_name . '"></div>';
-			echo '<div class = "list-column"><span class = "BA-green">' . $row->prd_name . '</span></div>';
-			echo '<div class = "list-column low-p"><span id = "' . $row->cat_ID . '" class = "BA-green">' . $row->cat_name . '</span></div>';
-			echo '<div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont">' . number_format((float)$row->prd_price) . '</span></span><span class = "hidden">' . $row->prd_price . '</span></div>';
-			echo '<div class = "list-column low-p"><span class = "BA-green">' . $row->prd_quantity . '</span></div>';
-			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_type . '</span></div>';
-			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_description . '</span></div>';  
-			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_condition . '</span></div>'; 
-			echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_ID . '</span></div>';
-			echo '<div class = "hidden"><span class = "BA-green">' . $row->pic_name . '</span></div>'; 
-			echo '<div class = "hidden"><span class = "BA-green">' . $row->loc_ID . '</span></div>'; 		       
-			echo '<div class = "list-column low-p">';
-			echo '<div class = "ctrl-icons-cont">';
-			echo '<img id = "' . $row->prd_ID . '" src="' . base_url()  . 'images/edit.jpg" class="ctrl-icons edit-btn prd">';
-			echo '<img id = "' . base_url("DBController/del_prd/" . $row->prd_ID) . '" src="' . base_url() . 'images/delete.jpg" class="ctrl-icons del-btn prd">';
-			echo '</div>';
-			echo '</div>';
-			echo '<div class = "list-column show-hidden view-more-btn"><span class = "BA-dark-orange">View more...</span></div>';
-			echo '</div>';
-		}	
+	public function load_filtered_products($products, $user_type = "client"){
+		if($user_type == "client"){
+			foreach($products->result() as $row){
+				echo '<div id = "' . $row->prd_ID . '"class = "list-row">';
+				echo '<div class = "list-column"><img class = "prd-thumbnails" alt = "' . $row->pic_name . '" src="' . base_url() . 'images/uploads/' . $row->pic_name . '"></div>';
+				echo '<div class = "list-column"><span class = "BA-green">' . $row->prd_name . '</span></div>';
+				echo '<div class = "list-column low-p"><span id = "' . $row->cat_ID . '" class = "BA-green">' . $row->cat_name . '</span></div>';
+				echo '<div class = "list-column"><span class = "BA-green"><span>MWK </span><span id = "price-cont">' . number_format((float)$row->prd_price) . '</span></span><span class = "hidden">' . $row->prd_price . '</span></div>';
+				echo '<div class = "list-column low-p"><span class = "BA-green">' . $row->prd_quantity . '</span></div>';
+				echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_type . '</span></div>';
+				echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_description . '</span></div>';  
+				echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_condition . '</span></div>'; 
+				echo '<div class = "hidden"><span class = "BA-green">' . $row->prd_ID . '</span></div>';
+				echo '<div class = "hidden"><span class = "BA-green">' . $row->pic_name . '</span></div>'; 
+				echo '<div class = "hidden"><span class = "BA-green">' . $row->loc_ID . '</span></div>'; 		       
+				echo '<div class = "list-column low-p">';
+				echo '<div class = "ctrl-icons-cont">';
+				echo '<img id = "' . $row->prd_ID . '" src="' . base_url()  . 'images/edit.jpg" class="ctrl-icons edit-btn prd">';
+				echo '<img id = "' . base_url("DBController/del_prd/" . $row->prd_ID) . '" src="' . base_url() . 'images/delete.jpg" class="ctrl-icons del-btn prd">';
+				echo '</div>';
+				echo '</div>';
+				echo '<div class = "list-column show-hidden view-more-btn"><span class = "BA-dark-orange">View more...</span></div>';
+				echo '</div>';
+			}	
+		}
+		else if ($user_type == "user"){
+			foreach($products->result() as $product){
+            	echo '<article  class = "prd-thumbnail-BP"><table class = "prd-thumbnail">';
+                echo '<tr><td class = "prdPic">';
+                echo '<img  src="' . base_url() . 'images/uploads/' . $product->pic_name . '" alt="pic loading failed">';
+                echo '</td></tr>';
+                echo '<tr><td>';
+                echo '<h5>' . $product->prd_name . '</h5>';
+                echo '<p>MK ' . number_format((float)$product->prd_price) . '</p>';
+                echo '<button class = "view-product">VIEW</button>';
+                echo '</td></tr>';
+            	echo '</table></article>';
+			}
+		}
 	}
 	public function load_filtered_locations($locations){
 		foreach($locations->result() as $row){

@@ -2,23 +2,24 @@
     <header class = "info">
         <header id="heading">
             <p class = "BA-green no-margin">
-                Zest Shop at Bunda, Lilongwe
+                <a class = "BA-dark-orange" href = "<?php echo base_url("DBController/show_business/" . $biz_details->biz_ID); ?>"><?php echo $biz_details->biz_name;?></a> in <?php echo $location->loc_area . "," . $location->loc_district; ?>
             </p>	
         </header>
     </header>
     <section class = "product">
         <section class = "product-image margin-top-std">
-        <img src="<?php echo base_url(); ?>images/uploads/black_magic.jpg">
+        <img src="<?php echo base_url("images/uploads/" . $prd_info->pic_name); ?>">
         <div class = "margin-top-std">
             <button id = "user-place-order-btn"  class = "BA-button">Place Order</button>
             <button id = "user-send-email-btn" class = "BA-button">Email Enquiry</button>
         </div>
         </section>
         <section class = "product-info margin-top-std">
-            <p class = "BA-dark-orange">PRODUCT NAME</p>
-            <p class = "BA-green">PRICE</p>
-            <p class = "BA-dark-orange">QUANTITY</p>
-            <p class = "BA-green">BRAND NEW OR SECOND HAND</p>
+            <p class = "BA-dark-orange">PRODUCT NAME: <br><span><?php echo $prd_info->prd_name;?></span></p>
+            <p class = "BA-green">PRICE: <br><span><?php echo $prd_info->prd_price;?></span></p>
+            <p class = "BA-dark-orange">QUANTITY: <br><span><?php echo $prd_info->prd_quantity;?></span></p>
+            <p class = "BA-green">CONDITION: <br><span><?php echo $prd_info->prd_condition;?></span></p>
+            <p class = "BA-dark-orange">DESCRIPTION: <br><span><?php echo $prd_info->prd_description;?></span></p>
         </section>
     </section>
 </section> 

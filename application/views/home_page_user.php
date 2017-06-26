@@ -16,81 +16,47 @@
 	<section class = "main-content-container-h margin-bottom-std">
 		<p class = "BA-green center h-font-size">Trending Businesses</p>
 		<table class = "promotions">
+        	<?php foreach($trending_biz->result() as $row): ?>
 			<tr>
 				<td class='trend-item'>
-                	<a class = "cat-biz-name" href = '#'>Business Name
-                		<span style='color: rgb(154,71,14); float: right;'>(num of views)</span>
+                	<a href = '<?=base_url($row->biz_ID) ?>'>
+						<?=$row->biz_name?>
+                		<span style='color: rgb(154,71,14); float: right;'>(<?=$row->num_views?>)</span>
                     </a>
                 </td>				
 			</tr>
-            <tr>
-				<td class='trend-item'>
-                	<a class = "cat-biz-name" href = '#'>Business Name
-                		<span style='color: rgb(154,71,14); float: right;'>(num of views)</span>
-                    </a>
-                </td>				
-			</tr>
-            <tr>
-				<td class='trend-item'>
-                	<a class = "cat-biz-name" href = '#'>Business Name
-                		<span style='color: rgb(154,71,14); float: right;'>(num of views)</span>
-                    </a>
-                </td>				
-			</tr>
+         	<?php endforeach; ?>
 		</table>
         <p class = "see-more BA-orange">see more...</p>
 	</section>
     <section class = "main-content-container-h margin-bottom-std">
 		<p class = "BA-green center h-font-size">Trending Products</p>
 		<table class = "promotions">
+        	<?php foreach($trending_prds->result() as $prd): ?>
 			<tr>
 				<td class='trend-item'>
-                	<a class = "product-name" href = '#'>Product Name
-                		<span style='color: rgb(154,71,14); float: right;'>(num of views)</span>
+                	<a href = '<?=base_url("DBController/show_product/" . $prd->biz_ID . "/" . $prd->prd_ID . "/" . $prd->loc_ID) ?>'><?=$prd->prd_name?>
+                		<span style='color: rgb(154,71,14); float: right;'>(<?=$prd->num_views?>)</span>
                     </a>
                 </td>				
 			</tr>
-            <tr>
-				<td class='trend-item'>
-                	<a class = "product-name" href = '#'>Product Name
-                		<span style='color: rgb(154,71,14); float: right;'>(num of views)</span>
-                    </a>
-                </td>				
-			</tr>
-            <tr>
-				<td class='trend-item'>
-                	<a class = "product-name" href = '#'>Product Name
-                		<span style='color: rgb(154,71,14); float: right;'>(num of views)</span>
-                    </a>
-                </td>				
-			</tr>
+           <?php endforeach; ?>
 		</table>
         <p class = "see-more BA-orange">see more...</p>
 	</section>
 	<section class = "main-content-container-h margin-bottom-std">
 		<p class = "BA-green center h-font-size">New Businesses</p>
 		<table class = "promotions">
+            <?php foreach($new_biz as $biz): ?>
 			<tr>
-            	<td class='trend-item'>
-                	<a class = "cat-biz-name" href = '#'>Business Name
-                    	<span style='color: rgb(154,71,14); float: right;'>(num of views)</span>
+				<td class='trend-item'>
+                	<a href = '<?=base_url($biz["biz_ID"]) ?>'>
+						<?=$biz["biz_name"]?>
+                		<span style='color: rgb(154,71,14); float: right;'><?=$biz["biz_slogan"]?></span>
                     </a>
-                </td>		
+                </td>				
 			</tr>
-            <tr>
-            	<td class='trend-item'>
-                	<a class = "cat-biz-name" href = '#'>Business Name
-                    	<span style='color: rgb(154,71,14); float: right;'>(num of views)</span>
-                    </a>
-                </td>		
-			</tr>
-            <tr>
-            	<td class='trend-item'>
-                	<a class = "cat-biz-name" href = '#'>Business Name
-                    	<span style='color: rgb(154,71,14); float: right;'>(num of views)</span>
-                    </a>
-                </td>		
-			</tr>
+           <?php endforeach; ?>
 		</table>
         <p class = "see-more BA-orange">see more...</p>
 	</article>

@@ -26,7 +26,7 @@
                             <h4 class = "card-name BA-green"><?=$row->biz_name?></h4>
                             <p class = "card-sub-name"><?=$row->biz_slogan?></p>
                             <p class = "card-sub2-name BA-dark-orange"><?=$row->biz_main_field?></p>
-                            <a href = "<?php echo base_url("DBController/show_business_ctrl_panel/" . $row->biz_ID);?>"><button class = "biz-card-button">VIEW</button></a>
+                            <a href = "<?php echo base_url($row->biz_ID);?>"><button class = "biz-card-button">VIEW</button></a>
                         </section>
                      </article>
                 <?php endforeach; ?>            		

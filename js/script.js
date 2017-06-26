@@ -105,10 +105,10 @@ $(document).ready(function(){
 		$("#text").slideToggle("slow");
 	});	
 	$("#about-us").click(function(){		
-		load_page($(this).attr("id"));
+		$("#page-nav").append(">> About Us");
 	}); 
 	$("#contact-us").click(function(){		
-		load_page($(this).attr("id"));
+		$("#page-nav").append(">> Contact Us");
 	}); 
 	function load_page(id){
 		$.ajax({
@@ -190,7 +190,18 @@ $(document).ready(function(){
 	});
 	$(".main-content-area").on("click",".view-product", function(){
 		$(".modal-BG").css("display","flex");
-		$(".modal-frame").html($("#user-view-product").html());			
+		$(".modal-frame").html($("#user-view-product").html())
+		$("#user-view-prd-pic").attr("src",$(this).parent().parent().prev().find("img").attr("src"));
+		$("#user-view-prd-name span").text($(this).siblings().eq(0).text());
+		$("#user-view-prd-price span").text($(this).siblings().eq(1).text());
+		$("#user-view-prd-quantity span").text($(this).siblings().eq(2).text());
+		$("#user-view-prd-condition span").text($(this).siblings().eq(3).text());
+		$("#user-view-prd-description span").text($(this).siblings().eq(4).text());
+		var str = $(this).attr("id");	
+		$.ajax({
+			type:'POST',
+			url: "http://Business_arena/index.php/DBController/add_prd_view/" + str
+		});			
 	});
 	$(".main-content-area").on("click","#user-place-order-btn", function(){
 		$(".modal-BG").css("display","flex");
@@ -200,6 +211,23 @@ $(document).ready(function(){
 		$(".modal-BG").css("display","flex");
 		$(".modal-frame, .modal-frame-small").html($("#user-send-email").html());
 	});
+	$(".main-content-area").on("change","#user-prd-area-filter", function(){
+		var str = $(this).val();
+		ajax_search(str,"http://Business_arena/index.php/DBController/filter/user-prd-area-filter");
+	});
+	$(".main-content-area").on("change","#user-prd-type-filter", function(){
+		var str = $(this).val();
+		ajax_search(str,"http://Business_arena/index.php/DBController/filter/user-prd-type-filter");
+	});
+	$(".main-content-area").on("change","#user-prd-cat-filter", function(){
+		var str = $(this).val();
+		ajax_search(str,"http://Business_arena/index.php/DBController/filter/user-prd-cat-filter");
+	});
+	$(".main-content-area").on("keyup","#user-prd-search", function(){
+		var str = $(this).val();
+		ajax_search(str,"http://Business_arena/index.php/DBController/filter/user-prd-search")
+	});
+	
 	
 	/*user home page scripts*/
 	$(".see-more").click(function(){
@@ -362,23 +390,6 @@ $(document).ready(function(){
 		var str = $(this).val();
 		ajax_search(str,"http://Business_arena/index.php/DBController/filter/client-loc-search")
 	});
-	
-	function ajax_search(str,url_string){
-		$.ajax({
-			type:'POST',
-			data: {search_string: str},
-			url: url_string,
-			beforeSend: function(){
-				$(".main-content-area, .main-content-area-cat-closed").append($("#loader").html());
-			},
-			complete: function(){
-				$(".loader-thin").fadeOut("slow");
-			},
-			success: function(result){
-				$(".client-item-list-cont").html(result);
-			}
-		});
-	}
 	$(".main-content-area").on("change","#client-prd-type-filter", function(){
 		var str = $(this).val();
 		ajax_search(str,"http://Business_arena/index.php/DBController/filter/client-prd-type-filter");
@@ -429,6 +440,22 @@ $(document).ready(function(){
 		$("#del-loc-country span").text($("div#" + $(this).prev().attr("id")).children().eq(3).children("span").text());
 		$("#del-loc-btn").attr("href",$(this).attr("id"));
 	});
+	function ajax_search(str,url_string){
+		$.ajax({
+			type:'POST',
+			data: {search_string: str},
+			url: url_string,
+			beforeSend: function(){
+				$(".client-item-list-cont, #item-list").append($("#loader").html());
+			},
+			complete: function(){
+				$(".loader-thin").fadeOut("slow");
+			},
+			success: function(result){
+				$(".client-item-list-cont, #item-list").html(result);
+			}
+		});
+	}
 	/*$(".main-content-area").on("click","#del-prd-delete-btn", function(){
 		var prd_ID = $("#del-prd-ID").text();
 		$(".modal-BG").hide();
