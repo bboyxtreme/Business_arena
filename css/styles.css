@@ -185,7 +185,7 @@ a{
 	justify-content: space-between;
 	flex-wrap: wrap;
 }
-.htop input{
+.search-box{
 	width: 180px;
 	height: 35px;
 	padding: 5px 10px;
@@ -371,6 +371,7 @@ article.stats h3{
 	box-sizing: border-box;
 } 
 .see-more{
+	display:block;
 	margin: auto;
 	text-align: right;
 	padding: 10px;
@@ -442,7 +443,7 @@ header#search input{
 header#search input:focus{
 	box-shadow: 0 0 5px #337ae7;
 }
-ul#uBizPageMenu{
+.tab-menu{
 	display: inline-block;
 	list-style-type: none;
 	margin: 0;
@@ -450,16 +451,15 @@ ul#uBizPageMenu{
 	min-width: 210px;
 	background-color: rgb(189,89,1);
 }
-ul#uBizPageMenu li{
+.tab-menu li{
 	display: inline-block;
 	border-left: 1px solid rgb(189,89,1);
 	border-right: 1px solid rgb(189,89,1);
 	padding: 5px;
-	color: white;
-	
+	color: white;	
 	cursor: pointer;
 }
-ul#uBizPageMenu li.active{
+.tab-menu li.active{
 	background-color: white;
 	color: rgb(189,89,1);
 }
@@ -522,8 +522,8 @@ table.prd-thumbnail p{
 }
 table.results-frame th{
 	padding: 10px;
-	background-color: rgba(189,89,1,0.9);
-	color: rgb(255,255,255);
+	background-color: rgb(255,255,255);
+	color: rgb(189,89,1,1);
 }
 table.results-frame a{
 	text-decoration: none;
@@ -951,7 +951,7 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 .justify{
 	text-align: justify;	
 }
-.closebtn, .modal-closebtn{
+.closebtn, .modal-closebtn, .hover-green{
 	position: absolute;
 	right: 0;
 	top: 0;
@@ -960,7 +960,7 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 	transition: 0.3s;
 	cursor: pointer;
 }
-.closebtn:hover, .modal-closebtn:hover{
+.closebtn:hover, .modal-closebtn:hover, .hover-green:hover{
 	background-color: rgba(0,50,0,0.7);
 	color: rgb(255,255,255);
 }
@@ -1142,15 +1142,23 @@ table.information-wide td, table.information-wide th, table.information-mobile t
 .view-more-btn{
 	cursor: pointer;	
 }
+.shadow{
+	text-shadow: 1px 1px black;
+}
+.pos-relative{
+	position: relative;
+}
 
 /*Specific styles container*/
 #make-payment-cont{
 	position: relative; 
 	min-height: 200px;	
 }
-.shadow{
-	text-shadow: 1px 1px black;
-}
+/*#main-search-btn{
+	width: 35px;
+	text-align: center;
+}*/
+
 
 /*#client-function-select{
 	margin: 5px 0;	

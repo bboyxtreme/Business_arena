@@ -49,15 +49,17 @@
         </section>
         <div class = "site-controls">
         	<button id = "back-button" class = "BA-button-orange margin-right-std">&#8592;</button>
-            <input type = "text" id = "main-search" class = "search-icon" placeholder="&#128269; Search catalogue...">
-            <button id = "main-search-btn" class = "BA-button-yellow">&#128269;</button>
+            <?php echo form_open('search',array('method'=>'post','class'=>'site-controls'));?>
+            <input type = "text" name = "search-phrase" id = "main-search" class = "search-box" placeholder="&#128269; Search catalogue..." required>
+            <input type = "submit"  value = "&#128269;" id = "main-search-btn" class = "BA-button-yellow">
+            <?php echo form_close(); ?>
         </div>
 	</header>
 	<aside class = "catalogue-cont-mobile margin-bottom-std">
 		<span class = "closebtn">&#10060;</span>
         <select class = "BA-green LC">
         	<option>Location Catalog</option>
-        	<option>Product Catalog</option>
+        	<option disabled>Product Catalog</option>
         </select>
 		<div id='cssmenu'>
         	<ul>

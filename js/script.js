@@ -129,7 +129,7 @@ $(document).ready(function(){
 	$(".login-container").mouseleave(function(){
 		$(".login-container").hide("slow");
 	});
-	$("input.uSearch, #main-search").keypress(function(e){
+	/*$("input.uSearch, #main-search").keypress(function(e){
 		$("#page-nav").html("<a href = '#' id = 'nav-home' class = 'BA-orange BA-anchor'>Home</a><span class = 'BA-orange'> >> Search Results</span>");
 		var keyNum = e.keyCode ? e.keyCode : e.which;
 		if (keyNum == 13){
@@ -141,7 +141,7 @@ $(document).ready(function(){
 		var search_phrase = $("input.uSearch").val();
 		load_search_results(search_phrase,13);
 		$("#loading").hide();
-	});
+	});*/
 	function load_search_results(search_phrase,keyNum){		
 		if (keyNum == 13){
 			ajax_update('http://Business_arena/index.php/DBController/load/searchresults');
@@ -171,26 +171,28 @@ $(document).ready(function(){
 			}
 		});	
 	});*/	
+	
+	//USER PANEL SCRIPTS
 	/*user business page scripts*/
-	$('.main-content-area').on("click",'ul#uBizPageMenu li',function(){
+	$('.main-content-area').on("click",'.tab-menu li',function(){
 		$(this).addClass('active');
 		$(this).siblings().removeClass('active');
 	});
-	$('.main-content-area').on("click",'ul#uBizPageMenu li.contacts',function(){
-		$("section#bizPrdDisplay, section#location").hide();
+	$('.main-content-area').on("click",'.tab-menu li.contacts',function(){
+		$("section#user-products, section#location").hide();
 		$("section#contacts").show();
 	});
-	$('.main-content-area').on("click",'ul#uBizPageMenu li.prds',function(){
+	$('.main-content-area').on("click",'.tab-menu li.prds',function(){
 		$("section#contacts, section#location").hide();
-		$("section#bizPrdDisplay").show();	
+		$("section#user-products").show();	
 	});
-	$('.main-content-area').on("click",'ul#uBizPageMenu li.location',function(){
-		$("section#contacts, section#bizPrdDisplay").hide();
+	$('.main-content-area').on("click",'.tab-menu li.location',function(){
+		$("section#contacts, section#user-products").hide();
 		$("section#location").show();	
 	});
 	$(".main-content-area").on("click",".view-product", function(){
 		$(".modal-BG").css("display","flex");
-		$(".modal-frame").html($("#user-view-product").html())
+		//$(".modal-frame").html($("#user-view-product").html())
 		$("#user-view-prd-pic").attr("src",$(this).parent().parent().prev().find("img").attr("src"));
 		$("#user-view-prd-name span").text($(this).siblings().eq(0).text());
 		$("#user-view-prd-price span").text($(this).siblings().eq(1).text());
@@ -207,9 +209,21 @@ $(document).ready(function(){
 		$(".modal-BG").css("display","flex");
 		$(".modal-frame, .modal-frame-small").html($("#user-capture-contacts").html());
 	});
+	$(".main-content-area").on("click","#modal-user-place-order-btn", function(){
+		$("#user-capture-contacts").siblings().hide();
+		$("#user-capture-contacts").show();
+	});
 	$(".main-content-area").on("click","#user-send-email-btn", function(){
 		$(".modal-BG").css("display","flex");
 		$(".modal-frame, .modal-frame-small").html($("#user-send-email").html());
+	});
+	$(".main-content-area").on("click","#modal-user-send-email-btn", function(){
+		$("#user-send-email").siblings().hide();
+		$("#user-send-email").show();
+	});
+	$(".main-content-area").on("click",".user-prd-view-back-btn", function(){
+		$("#user-view-product").siblings().hide();
+		$("#user-view-product").show();
 	});
 	$(".main-content-area").on("change","#user-prd-area-filter", function(){
 		var str = $(this).val();
@@ -230,9 +244,19 @@ $(document).ready(function(){
 	
 	
 	/*user home page scripts*/
-	$(".see-more").click(function(){
+	/*$(".see-more").click(function(){
 		$(document).scrollTop(0);
 		ajax_update('http://Business_arena/index.php/DBController/load/promotions');
+	});*/
+	
+	/*search page scripts*/
+	$(".main-content-area").on("click","#search-biz-tab",function(){
+		$("#business-results").siblings().hide();
+		$("#business-results").show();	
+	});
+	$(".main-content-area").on("click","#search-prd-tab",function(){
+		$("#prd-results").siblings().hide();
+		$("#prd-results").show();	
 	});
 	
 	/*Client panel scripts*/
@@ -622,6 +646,9 @@ $(document).ready(function(){
 	/*general scripts*/
 	$(".main-content-area").on("click", ".modal-closebtn", function(){
 		$(this).parent().parent().hide();
+	});
+	$(".main-content-area").on("click", ".close-window-btn", function(){
+		$(this).parent().parent().parent().hide();
 	});
 	$(".main-content-area").on("click", ".view-more-btn.prd", function(){
 		$(".modal-frame, .modal-frame-small").html($("#view-more-content").html());

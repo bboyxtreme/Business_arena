@@ -172,17 +172,19 @@ class BA_model extends CI_Model {
 		}
 		return $result;
 	}
-	public function load_trending_biz(){
+	public function load_trending_biz($limit = "1000", $offset = "0"){
 		$this->db->select("businesses.biz_ID,biz_name, count(*) as num_views")->from("users_view_business")
 			->join("businesses","users_view_business.biz_ID = businesses.biz_ID")
 			->group_by("biz_name")
-			->order_by("num_views","DESC");
+			->order_by("num_views","DESC")
+			->limit($limit,$offset);
 		$result = $this->db->get();
 		return $result;
 	}
-	public function load_new_biz(){
+	public function load_new_biz($limit = "1000", $offset = "0"){
 		$this->db->select("biz_ID,biz_name, biz_slogan, biz_reg_date")->from("businesses")
-				->order_by("biz_reg_date","DESC");
+				->order_by("biz_reg_date","DESC")
+				->limit($limit,$offset);
 		$result = $this->db->get();
 		$new_biz = array();
 		$count = 0;
@@ -197,11 +199,12 @@ class BA_model extends CI_Model {
 		}
 		return $new_biz;
 	}
-	public function load_trending_prds(){
+	public function load_trending_prds($limit = "1000", $offset = "0"){
 		$this->db->select("business_products.prd_ID,prd_name,biz_ID,loc_ID,count(*) as num_views")->from("users_view_products")
 			->join("business_products","users_view_products.prd_ID = business_products.prd_ID")
 			->group_by("users_view_products.prd_ID")
-			->order_by("num_views","DESC");
+			->order_by("num_views","DESC")
+			->limit($limit,$offset);
 		$result = $this->db->get();
 		return $result;
 	}
@@ -306,7 +309,7 @@ class BA_model extends CI_Model {
 		}	
 	}
 	public function load_prd_names($biz_ID){
-		$this->db->select("prd_name")
+		$this->db->select("prd_name") 
 			->from("business_products")
 			->where("biz_ID",$biz_ID);
 		$result = $this->db->get();
@@ -584,6 +587,97 @@ class BA_model extends CI_Model {
 			$result = $last_record->row()->$column;
 		}		
 		return $result;		
+	}
+	public function prd_search($search_items, $mod){
+		$select = array("prd_ID","biz_ID","loc_ID","prd_name");
+		if ($mod == "strict"){
+			$this->db->select($select)->from("business_products");
+			foreach ($search_items as $item){
+				$this->db->like("prd_name",$item);
+			}	
+			$result = $this->db->get();
+			return $result;
+		}	
+		else if ($mod == "close"){
+			$this->db->select($select)->from("business_products");
+			$counter = 0;
+			foreach ($search_items as $item){
+				if ($counter == 0){
+					$this->db->like("prd_name",$item);	
+				}
+				else{
+					$this->db->or_like("prd_name", $item);
+				}
+				$counter++;
+			}	
+			$result = $this->db->get();
+			return $result;
+		}	
+	}
+	public function biz_search($search_items, $mod){
+		if ($mod == "strict"){
+			$this->db->select("biz_ID, biz_name")->from("businesses");
+			foreach ($search_items as $item){
+				$this->db->like("biz_name",$item);
+			}	
+			$result = $this->db->get();
+			return $result;
+		}	
+		else if ($mod == "close"){
+			$this->db->select("biz_ID, biz_name")->from("businesses");
+			$counter = 0;
+			foreach ($search_items as $item){
+				if ($counter == 0){
+					$this->db->like("biz_name",$item);	
+				}
+				else{
+					$this->db->or_like("biz_name", $item);
+				}
+				$counter++;
+			}	
+			$result = $this->db->get();
+			return $result;
+		}	
+	}
+	public function loc_search($search_items, $mod){
+		if ($mod == "strict"){
+			$this->db->select("loc_ID, loc_area")->from("business_locations");
+			foreach ($search_items as $item){
+				$this->db->group_start();
+					$this->db->like("loc_area",$item);
+					$this->db->or_like("loc_district",$item);
+					$this->db->or_like("loc_country",$item);
+					$this->db->or_like("loc_description",$item);
+				$this->db->group_end();			
+			}	
+			$result = $this->db->get();
+			return $result;
+		}	
+		else if ($mod == "close"){
+			$this->db->select("loc_ID, loc_area")->from("business_locations");
+			$counter = 0;
+			foreach ($search_items as $item){
+				if ($counter == 0){
+					$this->db->group_start();
+						$this->db->like("loc_area",$item);
+						$this->db->or_like("loc_district",$item);
+						$this->db->or_like("loc_country",$item);
+						$this->db->or_like("loc_description",$item);
+					$this->db->group_end();
+				}
+				else{
+					$this->db->or_group_start();
+						$this->db->like("loc_area",$item);
+						$this->db->or_like("loc_district",$item);
+						$this->db->or_like("loc_country",$item);
+						$this->db->or_like("loc_description",$item);
+					$this->db->group_end();
+				}
+				$counter++;
+			}	
+			$result = $this->db->get();
+			return $result;
+		}	
 	}
 /*	public function generateCatalogue($userType){
 		if ($userType == "client"){

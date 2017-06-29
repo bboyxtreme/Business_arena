@@ -12,9 +12,9 @@ class DBController extends CI_Controller {
 	public function index($user_type = "Customer"){	
 		if ($user_type == "Customer"){
 			$data['catalogue'] = $this->BA_model->load_catalogue();
-			$data['trending_biz'] = $this->BA_model->load_trending_biz();
-			$data['new_biz'] = $this->BA_model->load_new_biz();
-			$data['trending_prds'] = $this->BA_model->load_trending_prds();
+			$data['trending_biz'] = $this->BA_model->load_trending_biz(5);
+			$data['new_biz'] = $this->BA_model->load_new_biz(5);
+			$data['trending_prds'] = $this->BA_model->load_trending_prds(10);
 			/*foreach($data['trending_prds']->result() as $row){
 				echo $row->prd_name . " " . $row->num_views . "<br>";
 			}
@@ -61,17 +61,17 @@ class DBController extends CI_Controller {
 	public function show_business($business_name, $loc_ID = "not_specified"){
 		if($loc_ID == "not_specified"){			
 			$user_type = $this->session->userdata("user_type");
-			if($user_type == "Business_Owner"){
-				$biz_ID = $business_name;
+			$biz_ID = $business_name;
+			if($user_type == "Business_Owner"){				
 				$this->show_business_ctrl_panel($biz_ID);
 			}
-			else{
-				$biz_ID = $business_name;		
+			else{	
 				$this->session->set_userdata("biz_ID",$biz_ID);
 				$this->session->set_userdata("loc_ID",$loc_ID);
 				$this->BA_model->add_view($biz_ID,"anon","business",$loc_ID);
 				$data['biz_info'] = $this->BA_model->load_business_info("anon",$business_name)->row();	
-				$data['locations'] = $loc_ID == "not_specified" ? "no_location" : $this->BA_model->get_location($loc_ID)->row();
+				$data['locations'] = $this->BA_model->load_locations($biz_ID);
+				$data['location'] = "no_location";
 				$data["filter_locations"] = $this->BA_model->load_locations($biz_ID,"prd-locations");
 				$data['products'] = $this->BA_model->load_products($biz_ID,"prd-area-filter",$loc_ID);
 				$data["page"] = "user-business";
@@ -157,11 +157,71 @@ class DBController extends CI_Controller {
 		$this->load("promotions");
 		$this->load->view('footer');
 	}	
-	public function show_search_results($search_phrase){
-		echo "search results: " . $search_phrase;
-		/*$this->load->view('header');
-		$this->load("searchresults");
-		$this->load->view('footer');*/
+	public function show_search_results(){
+		$search_value = $this->input->post("search-phrase");
+		$search_phrase = strToLower($search_value);	
+		$user_type = $this->session->userdata("user_type");
+		$user_ID = $this->session->userdata("user_ID");	
+		$search_items = explode(" ",$search_phrase); 
+		
+		//1. Product search
+		$prd_results = $this->BA_model->prd_search($search_items,"strict");
+		if ($prd_results->num_rows() == 0){
+			$prd_results = $this->BA_model->prd_search($search_items,"close");
+		}
+		
+		//2. Business search
+		$biz_results = $this->BA_model->biz_search($search_items,"strict");
+		if ($biz_results->num_rows() == 0){
+			$biz_results = $this->BA_model->biz_search($search_items,"close");
+		}
+		
+		//3. Location search
+		$loc_results = $this->BA_model->loc_search($search_items,"strict");
+		if ($loc_results->num_rows() == 0){
+			$loc_results = $this->BA_model->loc_search($search_items,"close");
+		}
+		
+		$search_results = array();
+		if($prd_results->num_rows() != 0){
+			$counter = 0;	
+			foreach($prd_results->result() as $prd){				
+				$prd_details = $this->BA_model->load_products($prd->biz_ID,$prd->prd_ID)->row();
+				$prd_loc_details = $this->BA_model->get_location($prd->loc_ID)->row();
+				$prd_location = $prd_loc_details->loc_description;
+				$biz_info = $this->BA_model->load_business_info("",$prd->biz_ID)->row();
+				$search_results["prd_results"][$counter]["prd_name"] = $prd_details->prd_name;
+				$search_results["prd_results"][$counter]["prd_ID"] = $prd_details->prd_ID;
+				$search_results["prd_results"][$counter]["prd_biz_ID"] = $prd->biz_ID;
+				$search_results["prd_results"][$counter]["prd_loc_ID"] = $prd_details->loc_ID;
+				$search_results["prd_results"][$counter]["prd_location"] = $prd_location;
+				$search_results["prd_results"][$counter]["prd_biz_name"] = $biz_info->biz_name;
+				$counter++;
+			}
+		}
+		if($biz_results->num_rows() != 0){
+			$counter = 0;			
+			foreach($biz_results->result() as $biz){				
+				$biz_details = $this->BA_model->load_business_info("",$biz->biz_ID)->row();
+				$biz_locations = $this->BA_model->load_locations($biz->biz_ID);
+				$biz_fields = $biz_details->biz_main_field;
+				foreach($biz_locations->result() as $loc){
+					$biz_location = $loc->loc_description . ", " . $loc->loc_area . ", " . $loc->loc_district;
+					$search_results["biz_results"][$counter]["biz_name"] = $biz_details->biz_name;
+					$search_results["biz_results"][$counter]["biz_ID"] = $biz->biz_ID;
+					$search_results["biz_results"][$counter]["biz_loc_ID"] = $loc->loc_ID;
+					$search_results["biz_results"][$counter]["biz_field"] = $biz_fields;
+					$search_results["biz_results"][$counter]["biz_location"] = $biz_location;
+					$counter++;	
+				}							
+			}
+		}
+		$data['search_results'] = $search_results;
+		$data['search_phrase'] = $search_value;
+		$data['catalogue'] = $this->BA_model->load_catalogue();	
+		$this->load->view('header',$data);
+		$this->load->view('search_results',$data);
+		$this->load->view('footer');
 	}
 	public function load($page){
 		if ($page == "about-us"){
@@ -259,7 +319,8 @@ class DBController extends CI_Controller {
 			$last_name = $result->row()->last_name;
 			$data["log_status"] = "logged_in";
 			if ($user_type == "Admin"){		
-				$this->initiate_sesstion($user_ID, $user_type, $first_name, $last_name);		
+				$this->initiate_sesstion($user_ID, $user_type, $first_name, $last_name);
+				$data['catalogue'] = $this->BA_model->load_catalogue();		
 				$this->load->view('header_logged_in', $data);
 				$this->load->view('home_page_admin');
 				$this->load->view('footer');				
@@ -966,6 +1027,24 @@ class DBController extends CI_Controller {
             echo '<p class = "BA-yellow center">' . $row . '</p>';
         }
         echo '</div>';	
+	}
+	public function load_promotions($type){
+		if($type == "trendz_biz"){
+			$data['trends'] = $this->BA_model->load_trending_biz();
+			$data['trend_title'] = "Trending Businesses";
+		}
+		else if($type == "trendz_prds"){
+			$data['trends'] = $this->BA_model->load_trending_prds();
+			$data['trend_title'] = "Trending Products";
+		}
+		else if($type == "new_biz"){
+			$data['trends'] = $this->BA_model->load_new_biz();
+			$data['trend_title'] = "New Businesses";
+		}
+		$data['catalogue'] = $this->BA_model->load_catalogue();
+		$this->load->view('header',$data);		
+		$this->load->view('promotions',$data);
+		$this->load->view('footer');		
 	}
 }
 	

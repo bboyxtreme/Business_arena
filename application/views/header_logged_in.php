@@ -57,7 +57,7 @@
 		<span class = "closebtn">&#10060;</span>
         <select class = "shadow LC">
         	<option>Your Location Catalog</option>
-        	<option>Product Catalog</option>
+        	<option disabled>Product Catalog</option>
         </select>
 		<div id='cssmenu'>
         	<ul>

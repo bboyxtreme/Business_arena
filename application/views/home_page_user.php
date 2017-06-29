@@ -3,10 +3,10 @@
 			Search for products by product names, Business names, even locations. 
         </p>
 		<section class = 'uSearch'>
-			<?php //echo form_open('dbController/uSearch',array('method'=>'post','name'=>'Search Bar'));?>
-			<input type = "text" name = "uSrchPhrz" class = "uSearch"  placeholder = "&#128269; Search...">
+			<?php echo form_open('search',array('method'=>'post','name'=>'Search-Bar'));?>
+			<input type = "text" name = "search-phrase" class = "uSearch"  placeholder = "&#128269; Search..." required>
 			<input type = "submit" value = "Search" class = "uSearchB">
-			<?php //echo form_close(); ?>
+			<?php echo form_close(); ?>
 		</section>	
 		<p id = "cat-prompter" class = "center">
 			Don't forget to try out the catalog!!<br>
@@ -27,7 +27,7 @@
 			</tr>
          	<?php endforeach; ?>
 		</table>
-        <p class = "see-more BA-orange">see more...</p>
+        <a href = "<?php echo base_url("DBController/load_promotions/trendz_biz"); ?>" class = "see-more BA-orange">see more...</a>
 	</section>
     <section class = "main-content-container-h margin-bottom-std">
 		<p class = "BA-green center h-font-size">Trending Products</p>
@@ -42,7 +42,7 @@
 			</tr>
            <?php endforeach; ?>
 		</table>
-        <p class = "see-more BA-orange">see more...</p>
+        <a href = "<?php echo base_url("DBController/load_promotions/trendz_prds"); ?>" class = "see-more BA-orange">see more...</a>
 	</section>
 	<section class = "main-content-container-h margin-bottom-std">
 		<p class = "BA-green center h-font-size">New Businesses</p>
@@ -58,7 +58,7 @@
 			</tr>
            <?php endforeach; ?>
 		</table>
-        <p class = "see-more BA-orange">see more...</p>
+        <a href = "<?php echo base_url("DBController/load_promotions/new_biz"); ?>" class = "see-more BA-orange">see more...</a>
 	</article>
 	</section>	
 	
